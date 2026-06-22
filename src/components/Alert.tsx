@@ -6,6 +6,8 @@ interface AlertProps {
   tone?: "error" | "warning";
   onDismiss?: () => void;
   action?: { label: string; onClick: () => void };
+  /** Raw technical detail (e.g. the ffmpeg log tail), shown collapsed. */
+  details?: string;
 }
 
 export default function Alert({
@@ -14,6 +16,7 @@ export default function Alert({
   tone = "error",
   onDismiss,
   action,
+  details,
 }: AlertProps) {
   const toneStyles =
     tone === "error"
@@ -31,6 +34,17 @@ export default function Alert({
           {title}
         </p>
         <p className="mt-0.5 font-body text-sm text-duck-700/80">{message}</p>
+
+        {details && (
+          <details className="mt-2">
+            <summary className="cursor-pointer font-body text-xs font-bold text-duck-700/70 hover:text-duck-700">
+              Ver detalhes técnicos
+            </summary>
+            <pre className="mt-1 max-h-48 overflow-auto whitespace-pre-wrap break-words rounded-2xl bg-duck-900/5 p-3 font-mono text-[11px] leading-snug text-duck-700/90">
+              {details}
+            </pre>
+          </details>
+        )}
 
         {(action || onDismiss) && (
           <div className="mt-3 flex gap-2">

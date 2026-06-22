@@ -12,6 +12,7 @@ import { isAcceptedVideo, loadVideoMetadata } from "@/lib/video";
 import {
   FFmpegLoadError,
   ReencodeError,
+  getRecentFFmpegLog,
   loadFFmpeg,
   sliceVideo,
 } from "@/lib/ffmpeg";
@@ -35,6 +36,8 @@ import DuckMascot from "@/components/DuckMascot";
 interface ErrorState {
   title: string;
   message: string;
+  /** Real ffmpeg log tail / error text, surfaced for on-device debugging. */
+  details?: string;
 }
 
 export default function Home() {
@@ -181,7 +184,21 @@ export default function Home() {
       const isMemory = /memory|allocat|abort|out of bounds|RangeError/i.test(
         message,
       );
-      setError(
+      // Surface the real ffmpeg error on screen (collapsed) — on iOS Safari the
+      // dev console is out of reach, so this is the only way to see the actual
+      // exit code / muxer message. ReencodeError carries its own log; everything
+      // else (incl. the copy path) reads the engine's recent log tail.
+      const ffmpegLog = isReencode
+        ? (err as ReencodeError).ffmpegLog
+        : getRecentFFmpegLog();
+      const details =
+        [
+          message && `Erro: ${message}`,
+          ffmpegLog && `FFmpeg:\n${ffmpegLog}`,
+        ]
+          .filter(Boolean)
+          .join("\n\n") || undefined;
+      const errorState: ErrorState =
         isLoadFailure
           ? {
               title: "O patinho não conseguiu acordar 🦆💤",
@@ -206,8 +223,8 @@ export default function Home() {
                   title: "Algo deu errado no fatiamento 🦆",
                   message:
                     "Não consegui finalizar o corte. Tente novamente — se persistir, use um vídeo menor ou recarregue a página.",
-                },
-      );
+                };
+      setError({ ...errorState, details });
       // Throw away any parts produced before the failure.
       revokeSegments();
       setSegments([]);
@@ -239,6 +256,7 @@ export default function Home() {
             <Alert
               title={error.title}
               message={error.message}
+              details={error.details}
               onDismiss={() => setError(null)}
             />
           </div>

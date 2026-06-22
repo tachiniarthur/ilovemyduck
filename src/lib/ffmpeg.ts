@@ -52,6 +52,16 @@ function recentLogTail(lines = 14): string {
   return recentLogs.slice(-lines).join("\n");
 }
 
+/**
+ * The tail of the most recent ffmpeg log lines, for surfacing the *real* engine
+ * error in the UI. Used by the copy path (and any failure that doesn't carry its
+ * own log), so that — even on iOS Safari, where the dev console is out of reach —
+ * the actual ffmpeg message is visible on screen.
+ */
+export function getRecentFFmpegLog(lines = 14): string {
+  return recentLogTail(lines);
+}
+
 /** Thrown when the FFmpeg engine itself fails to load (vs. a slicing failure). */
 export class FFmpegLoadError extends Error {
   constructor(message: string, options?: { cause?: unknown }) {
@@ -207,17 +217,29 @@ async function copySlices(
 
     const sorted = [...cutTimes].sort((a, b) => a - b);
 
+    // Map only the first video + (optional) audio track. iPhone .mov captures
+    // carry extra timed-metadata/data tracks that "-map 0" would also select;
+    // the MP4 segment muxer can't write those and fails the whole copy with a
+    // non-zero exit code. Selecting v+a keeps the output identical for normal
+    // videos while dropping the tracks that break muxing.
     let code: number;
     if (sorted.length === 0) {
       // Single part — just copy the whole thing.
       console.info("[ffmpeg] copy (parte única)");
-      code = await instance.exec(["-i", inputName, "-c", "copy", "-map", "0", "part_000.mp4"]);
+      code = await instance.exec([
+        "-i", inputName,
+        "-c", "copy",
+        "-map", "0:v:0",
+        "-map", "0:a?",
+        "part_000.mp4",
+      ]);
     } else {
       console.info("[ffmpeg] copy via segment muxer; cortes:", sorted);
       code = await instance.exec([
         "-i", inputName,
         "-c", "copy",
-        "-map", "0",
+        "-map", "0:v:0",
+        "-map", "0:a?",
         "-f", "segment",
         "-segment_times", sorted.join(","),
         "-reset_timestamps", "1",
