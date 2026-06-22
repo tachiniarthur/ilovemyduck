@@ -1,0 +1,42 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color-scheme: light;
+}
+
+html,
+body {
+  height: 100%;
+}
+
+body {
+  /* A soft sky-to-pond gradient with gentle water ripples at the bottom. */
+  background-color: #fffbeb;
+  background-image:
+    radial-gradient(120% 80% at 50% -10%, #bfe7ff 0%, rgba(191, 231, 255, 0) 55%),
+    radial-gradient(90% 60% at 110% 110%, rgba(95, 214, 160, 0.35) 0%, rgba(95, 214, 160, 0) 60%),
+    radial-gradient(90% 60% at -10% 110%, rgba(247, 181, 0, 0.25) 0%, rgba(247, 181, 0, 0) 60%);
+  background-attachment: fixed;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+/* Keep focus rings friendly and visible for keyboard users. */
+:focus-visible {
+  outline: 3px solid #ff7a18;
+  outline-offset: 2px;
+  border-radius: 0.5rem;
+}
+
+/* Respect users who prefer less motion. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+  }
+}
