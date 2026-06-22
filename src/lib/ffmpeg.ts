@@ -70,6 +70,21 @@ export class FFmpegLoadError extends Error {
   }
 }
 
+/**
+ * Thrown when the fast stream-copy path fails (e.g. an iPhone .mov whose video
+ * codec/keyframe layout the MP4 segment muxer won't copy). It carries the real
+ * ffmpeg log tail and is caught internally to trigger the re-encode fallback —
+ * it should never reach the UI on its own.
+ */
+export class CopySliceError extends Error {
+  readonly ffmpegLog: string;
+  constructor(message: string, ffmpegLog: string) {
+    super(message);
+    this.name = "CopySliceError";
+    this.ffmpegLog = ffmpegLog;
+  }
+}
+
 /** Thrown when a 9:16 re-encode part fails (bad command, OOM, codec, etc.). */
 export class ReencodeError extends Error {
   /** Tail of the real ffmpeg log, for the console / bug reports. */
@@ -193,7 +208,24 @@ export async function sliceVideo(options: SliceOptions): Promise<VideoSegment[]>
   if (needsReencode(options.features)) {
     return reencodeSlices(instance, options);
   }
-  return copySlices(instance, options);
+
+  try {
+    return await copySlices(instance, options);
+  } catch (err) {
+    if (!(err instanceof CopySliceError)) throw err;
+    // The fast copy couldn't mux this input (common with iPhone .mov HEVC
+    // captures). Fall back to a per-part H.264/AAC re-encode, which always fits
+    // the MP4 container. With vertical "off" + no numbering this re-encodes the
+    // original frames as-is (no reframing), just normalizing the codec — slower
+    // than copy, but it actually produces playable parts. The re-encode path
+    // carries its own watchdog/timeout, so it can't hang the UI either.
+    console.warn(
+      "[ffmpeg] cópia direta falhou, recorrendo ao re-encode:",
+      err.message,
+    );
+    options.onProgress?.(0);
+    return reencodeSlices(instance, options);
+  }
 }
 
 // ---------------------------------------------------------------------------
@@ -249,7 +281,10 @@ async function copySlices(
 
     // exec() returns ffmpeg's exit code; non-zero means the command failed.
     if (code !== 0) {
-      throw new Error(`FFmpeg terminou com código ${code} ao fatiar o vídeo.`);
+      throw new CopySliceError(
+        `FFmpeg terminou com código ${code} ao fatiar o vídeo.`,
+        recentLogTail(),
+      );
     }
 
     return await collectSegments(instance, cutTimes, totalDuration, onSegment);
@@ -274,8 +309,9 @@ async function collectSegments(
 
   console.info("[ffmpeg] partes geradas:", partNames);
   if (partNames.length === 0) {
-    throw new Error(
+    throw new CopySliceError(
       "Nenhum segmento foi gerado — o muxer não produziu nenhum arquivo de saída.",
+      recentLogTail(),
     );
   }
 
