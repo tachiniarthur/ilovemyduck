@@ -10,8 +10,8 @@ interface VideoPreviewProps {
 
 export default function VideoPreview({ video, onReplace }: VideoPreviewProps) {
   return (
-    <div className="rounded-4xl bg-white/80 p-4 shadow-soft ring-1 ring-duck-200">
-      <div className="overflow-hidden rounded-3xl bg-black">
+    <div className="duck-card">
+      <div className="overflow-hidden rounded-3xl bg-black ring-1 ring-black/5">
         <video
           src={video.url}
           controls
@@ -21,7 +21,7 @@ export default function VideoPreview({ video, onReplace }: VideoPreviewProps) {
         />
       </div>
 
-      <div className="mt-3 flex flex-wrap items-center justify-between gap-2 px-1">
+      <div className="mt-4 flex flex-wrap items-center justify-between gap-3 px-1">
         <div className="flex flex-wrap items-center gap-2 font-body text-xs">
           <Badge>⏱ {formatDuration(video.duration)}</Badge>
           {video.width > 0 && (
@@ -35,7 +35,7 @@ export default function VideoPreview({ video, onReplace }: VideoPreviewProps) {
         <button
           type="button"
           onClick={onReplace}
-          className="rounded-full px-3 py-1.5 font-body text-xs font-bold text-bill-600 underline decoration-wavy underline-offset-2 hover:text-bill-500"
+          className="btn-ghost rounded-full px-3 py-1.5 text-xs font-bold underline-offset-2"
         >
           Trocar vídeo
         </button>
@@ -46,7 +46,7 @@ export default function VideoPreview({ video, onReplace }: VideoPreviewProps) {
 
 function Badge({ children }: { children: React.ReactNode }) {
   return (
-    <span className="inline-flex items-center rounded-full bg-duck-100 px-2.5 py-1 font-semibold text-duck-700">
+    <span className="inline-flex items-center rounded-full bg-duck-100 px-2.5 py-1 font-semibold tracking-wide text-duck-700 ring-1 ring-duck-200/70">
       {children}
     </span>
   );

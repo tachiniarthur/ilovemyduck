@@ -25,6 +25,8 @@ const config: Config = {
           400: "#ff9d4d",
           500: "#ff7a18", // bill orange
           600: "#ed5e00",
+          // Deep roasted-bill tone for AA-legible text on the yellow chips.
+          700: "#b84800",
         },
         sky: {
           // sky blue

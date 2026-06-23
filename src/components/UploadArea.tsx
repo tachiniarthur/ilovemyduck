@@ -56,11 +56,11 @@ export default function UploadArea({ onFile, disabled }: UploadAreaProps) {
         onDragLeave={() => setIsDragging(false)}
         onDrop={handleDrop}
         aria-label="Selecionar ou soltar um vídeo para fatiar"
-        className={`group relative flex w-full flex-col items-center justify-center gap-4 rounded-5xl border-4 border-dashed px-6 py-12 text-center transition-all duration-200 sm:py-16
+        className={`group relative flex w-full flex-col items-center justify-center gap-5 rounded-5xl border-4 border-dashed px-6 py-14 text-center backdrop-blur-sm transition-[transform,border-color,background-color] duration-200 ease-[var(--ease-soft)] sm:py-20
           ${
             isDragging
               ? "scale-[1.01] border-bill-500 bg-duck-100"
-              : "border-duck-300 bg-white/70 hover:border-bill-400 hover:bg-duck-50"
+              : "border-duck-300 bg-white/70 hover:-translate-y-0.5 hover:border-bill-400 hover:bg-duck-50 active:translate-y-0"
           }
           disabled:cursor-not-allowed disabled:opacity-60`}
       >
@@ -70,17 +70,17 @@ export default function UploadArea({ onFile, disabled }: UploadAreaProps) {
 
         <DuckMascot size={96} mood={isDragging ? "happy" : "waiting"} />
 
-        <div>
-          <p className="font-display text-xl font-extrabold text-bill-600 sm:text-2xl">
+        <div className="space-y-1.5">
+          <p className="font-display text-xl font-extrabold leading-tight tracking-tight text-bill-600 sm:text-2xl">
             {isDragging ? "Pode soltar! 🦆" : "Quack! Solta o vídeo aqui"}
           </p>
-          <p className="mt-1 font-body text-sm text-duck-700/80">
+          <p className="font-body text-[0.95rem] leading-relaxed text-duck-700/80">
             Arraste e solte ou{" "}
-            <span className="font-bold text-bill-600 underline decoration-wavy">
+            <span className="font-bold text-bill-600 underline decoration-wavy underline-offset-2">
               toque para escolher
             </span>
           </p>
-          <p className="mt-3 font-body text-xs text-duck-700/60">
+          <p className="!mt-3 font-body text-xs font-medium tracking-wide text-duck-700/60">
             Aceita MP4, MOV e WebM · tudo fica no seu aparelho
           </p>
         </div>

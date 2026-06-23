@@ -4,6 +4,18 @@
 
 :root {
   color-scheme: light;
+
+  /* ---- Motion tokens -------------------------------------------------- */
+  /* A springy "duck bounce" for playful entrances, plus a calm standard
+     curve for everyday hover/press feedback. Centralizing them keeps every
+     interactive element moving with the same personality. */
+  --ease-duck: cubic-bezier(0.34, 1.56, 0.64, 1);
+  --ease-soft: cubic-bezier(0.22, 0.61, 0.36, 1);
+
+  /* ---- Vertical rhythm ------------------------------------------------ */
+  /* One knob for the gap between major stacked blocks so the whole flow
+     breathes consistently across phases. */
+  --stack-gap: 1.25rem;
 }
 
 html,
@@ -35,6 +47,70 @@ body {
   box-shadow:
     0 0 0 3px #fffbeb,
     0 0 0 6px #ff7a18;
+}
+
+@layer components {
+  /* ---- Surfaces ------------------------------------------------------- */
+  /* The single source of truth for the floating "pond foam" panels. Every
+     card (preview, controls, progress, results) shares the same radius,
+     translucency, ring and shadow so the screen reads as one set, not a
+     pile of slightly-different boxes. */
+  .duck-card {
+    @apply rounded-4xl bg-white/80 p-5 shadow-soft ring-1 ring-duck-200 backdrop-blur-sm sm:p-6;
+  }
+
+  /* ---- Eyebrow / section titles -------------------------------------- */
+  .section-title {
+    @apply font-display text-lg font-extrabold leading-snug tracking-tight text-bill-600;
+  }
+
+  /* ---- Buttons -------------------------------------------------------- */
+  /* Shared base: consistent press physics, transitions and disabled
+     handling so no two buttons feel different by accident. */
+  .btn {
+    @apply inline-flex items-center justify-center gap-2 rounded-2xl font-display font-extrabold
+      transition-[transform,background-color,box-shadow,color] duration-200 ease-[var(--ease-soft)]
+      disabled:cursor-not-allowed disabled:opacity-60;
+  }
+
+  /* Primary call to action — the one thing we most want tapped. Bill orange
+     is reserved for this role so it always reads as "the next step". */
+  .btn-primary {
+    @apply btn bg-bill-500 text-white shadow-soft-lg
+      hover:-translate-y-0.5 hover:bg-bill-400
+      active:translate-y-0.5 active:shadow-soft
+      disabled:hover:translate-y-0;
+  }
+
+  /* Confirm / success-leaning action (e.g. sending parts off to the gallery). */
+  .btn-success {
+    @apply btn bg-pond-500 text-white shadow-pop
+      hover:-translate-y-0.5 hover:bg-pond-400
+      active:translate-y-0.5 active:shadow-none
+      disabled:hover:translate-y-0;
+  }
+
+  /* Calm secondary action (e.g. download a ZIP) — present but never competing
+     with the primary CTA. */
+  .btn-info {
+    @apply btn bg-sky-500 text-white shadow-soft
+      hover:-translate-y-0.5 hover:bg-sky-400
+      active:translate-y-0.5 active:shadow-none
+      disabled:hover:translate-y-0;
+  }
+
+  /* Yellow "chip" action — the friendly, repeatable tap (per-part save,
+     add cut). Uses the chunky pop shadow for a tactile, toy-like press. */
+  .btn-chip {
+    @apply btn bg-duck-400 text-bill-700 shadow-pop
+      hover:bg-duck-300 active:translate-y-0.5 active:shadow-none;
+  }
+
+  /* Low-emphasis text action with the playful wavy underline. */
+  .btn-ghost {
+    @apply btn text-bill-600 underline decoration-wavy underline-offset-4
+      hover:text-bill-500 active:translate-y-0.5;
+  }
 }
 
 /* Respect users who prefer less motion. */

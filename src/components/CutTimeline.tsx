@@ -146,16 +146,14 @@ export default function CutTimeline({
 
   return (
     <div className="mt-5">
-      <div className="flex items-center justify-between gap-2">
+      <div className="flex items-center justify-between gap-3">
         <div>
-          <p className="font-display text-base font-extrabold text-bill-600">
-            Pontos de corte
-          </p>
-          <p className="font-body text-xs text-duck-700/70">
+          <p className="section-title">Pontos de corte</p>
+          <p className="mt-1 font-body text-xs leading-relaxed text-duck-700/70">
             Arraste as alcinhas 🦆 para cortar sem atropelar a fala.
           </p>
         </div>
-        <span className="shrink-0 rounded-full bg-pond-300/50 px-2.5 py-1 font-display text-xs font-extrabold text-pond-600">
+        <span className="shrink-0 rounded-full bg-pond-300/50 px-2.5 py-1 font-display text-xs font-extrabold text-pond-600 ring-1 ring-pond-400/30">
           {metas.length} {metas.length === 1 ? "parte" : "partes"}
         </span>
       </div>
@@ -240,12 +238,12 @@ export default function CutTimeline({
         )}
       </div>
 
-      <div className="mt-3 flex flex-wrap items-center gap-2">
+      <div className="mt-4 flex flex-wrap items-center gap-2">
         <button
           type="button"
           onClick={addCut}
           disabled={disabled}
-          className="rounded-full bg-duck-400 px-3 py-1.5 font-display text-xs font-extrabold text-bill-700 shadow-pop transition-all hover:bg-duck-300 active:translate-y-0.5 active:shadow-none disabled:opacity-50"
+          className="btn-chip rounded-full px-3.5 py-1.5 text-xs"
         >
           + Adicionar corte
         </button>
@@ -253,14 +251,14 @@ export default function CutTimeline({
           type="button"
           onClick={resetCuts}
           disabled={disabled}
-          className="rounded-full px-3 py-1.5 font-display text-xs font-extrabold text-bill-600 underline decoration-wavy underline-offset-2 hover:text-bill-500 disabled:opacity-50"
+          className="btn-ghost rounded-full px-3 py-1.5 text-xs underline-offset-2"
         >
           Voltar ao padrão
         </button>
       </div>
 
       {approximate && (
-        <p className="mt-2 font-body text-[11px] text-duck-700/60">
+        <p className="mt-3 font-body text-[11px] leading-relaxed text-duck-700/60">
           No modo rápido, cada corte encaixa no quadro-chave mais próximo do ponto
           escolhido — pode variar uns instantinhos. 🦆
         </p>

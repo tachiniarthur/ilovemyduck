@@ -11,19 +11,19 @@ export default function ProcessingProgress({ ratio, message }: ProcessingProgres
   const percent = Math.round(Math.max(0, Math.min(1, ratio)) * 100);
 
   return (
-    <div className="rounded-4xl bg-white/80 p-6 shadow-soft ring-1 ring-duck-200">
+    <div className="duck-card">
       <div className="flex flex-col items-center text-center">
         <DuckMascot size={96} mood="processing" />
-        <p className="mt-3 text-balance font-display text-xl font-extrabold tracking-tight text-bill-600">
+        <p className="mt-4 text-balance font-display text-xl font-extrabold leading-tight tracking-tight text-bill-600">
           {message}
         </p>
-        <p className="font-body text-sm text-duck-700/70">
+        <p className="mt-1 font-body text-sm leading-relaxed text-duck-700/70">
           O patinho está nadando pelos seus frames… 🌊
         </p>
       </div>
 
       {/* Progress track with a duck riding the wave */}
-      <div className="relative mt-6">
+      <div className="relative mt-7">
         <div className="h-5 w-full overflow-hidden rounded-full bg-sky-200">
           <div
             className="relative h-full rounded-full bg-gradient-to-r from-duck-400 to-bill-500 transition-[width] duration-300 ease-out"
@@ -48,10 +48,10 @@ export default function ProcessingProgress({ ratio, message }: ProcessingProgres
         </span>
       </div>
 
-      <p className="mt-3 text-center font-display text-2xl font-extrabold text-bill-600">
+      <p className="mt-4 text-center font-display text-3xl font-extrabold leading-none tracking-tight text-bill-600">
         {percent}%
       </p>
-      <p className="text-center font-body text-xs text-duck-700/60">
+      <p className="mt-1.5 text-center font-body text-xs leading-relaxed text-duck-700/60">
         Não feche essa aba — o patinho está trabalhando duro!
       </p>
     </div>

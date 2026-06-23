@@ -224,7 +224,7 @@ export default function Home() {
     <div className="flex min-h-screen flex-col">
       <Header />
 
-      <main className="mx-auto w-full max-w-2xl flex-1 px-4 pt-6">
+      <main className="mx-auto w-full max-w-2xl flex-1 px-4 pt-8 sm:pt-10">
         {/* Cross-origin isolation warning (FFmpeg won't run without it) */}
         {notIsolated && (
           <div className="mb-4">
@@ -249,7 +249,7 @@ export default function Home() {
 
         {/* IDLE — upload */}
         {phase === "idle" && (
-          <div className="space-y-6">
+          <div className="space-y-7">
             <Intro />
             <UploadArea onFile={handleFile} />
           </div>
@@ -257,7 +257,7 @@ export default function Home() {
 
         {/* READY — preview + controls */}
         {phase === "ready" && video && (
-          <div className="space-y-4">
+          <div className="space-y-5">
             <VideoPreview video={video} onReplace={handleReplace} />
 
             {sizeWarning && (
@@ -280,7 +280,7 @@ export default function Home() {
             <button
               type="button"
               onClick={handleSlice}
-              className="w-full rounded-3xl bg-bill-500 px-6 py-4 font-display text-xl font-extrabold tracking-tight text-white shadow-soft-lg transition-all hover:-translate-y-0.5 hover:bg-bill-400 active:translate-y-0.5 active:shadow-soft"
+              className="btn-primary w-full rounded-3xl px-6 py-4 text-xl tracking-tight"
             >
               Fatiar em {partsCount} {partsCount === 1 ? "parte" : "partes"} 🔪🦆
             </button>
@@ -289,7 +289,7 @@ export default function Home() {
 
         {/* PROCESSING */}
         {isProcessing && (
-          <div className="space-y-4">
+          <div className="space-y-5">
             <ProcessingProgress ratio={progress.ratio} message={progress.message} />
             {segments.length > 0 && <LiveParts segments={segments} />}
           </div>
@@ -309,12 +309,12 @@ export default function Home() {
 /** Parts that have finished while the rest are still processing. */
 function LiveParts({ segments }: { segments: VideoSegment[] }) {
   return (
-    <div className="rounded-4xl bg-white/80 p-4 shadow-soft ring-1 ring-duck-200">
-      <p className="mb-3 text-center font-display text-sm font-extrabold text-pond-600">
+    <div className="duck-card">
+      <p className="mb-4 text-center font-display text-sm font-extrabold tracking-tight text-pond-600">
         {segments.length} {segments.length === 1 ? "parte já saiu" : "partes já saíram"}{" "}
         do forno 🦆✨
       </p>
-      <div className="grid grid-cols-3 gap-2 sm:grid-cols-4">
+      <div className="grid grid-cols-3 gap-2.5 sm:grid-cols-4">
         {segments.map((segment) => (
           <div
             key={segment.index}
@@ -340,13 +340,13 @@ function LiveParts({ segments }: { segments: VideoSegment[] }) {
 function Intro() {
   return (
     <div className="text-center">
-      <div className="mx-auto mb-2 inline-flex">
+      <div className="mx-auto mb-3 inline-flex">
         <DuckMascot size={72} mood="happy" />
       </div>
-      <h2 className="text-balance font-display text-2xl font-extrabold tracking-tight text-bill-600 sm:text-3xl">
+      <h2 className="text-balance font-display text-[1.75rem] font-extrabold leading-[1.1] tracking-tight text-bill-600 sm:text-4xl">
         Vídeo longo? Deixa que o patinho fatia! 🦆
       </h2>
-      <p className="mx-auto mt-2 max-w-md text-pretty font-body text-sm text-duck-700/80 sm:text-base">
+      <p className="mx-auto mt-3 max-w-md text-pretty font-body text-[0.95rem] leading-relaxed text-duck-700/80 sm:text-base">
         Solte um vídeo e ele vira várias partes prontinhas para postar em
         sequência nos seus Stories. Sem editor complicado, sem enviar nada para
         servidor nenhum.

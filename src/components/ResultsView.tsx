@@ -40,12 +40,12 @@ export default function ResultsView({ segments, onStartOver }: ResultsViewProps)
   return (
     <div className="space-y-5">
       {/* Celebration banner */}
-      <div className="rounded-4xl bg-gradient-to-br from-duck-100 to-pond-300/40 p-6 text-center shadow-soft ring-1 ring-duck-200">
+      <div className="rounded-4xl bg-gradient-to-br from-duck-100 to-pond-300/40 p-6 text-center shadow-soft ring-1 ring-duck-200 backdrop-blur-sm sm:p-7">
         <DuckMascot size={88} mood="celebrating" className="mx-auto" />
-        <h2 className="mt-2 text-balance font-display text-2xl font-extrabold tracking-tight text-bill-600">
+        <h2 className="mt-3 text-balance font-display text-2xl font-extrabold leading-tight tracking-tight text-bill-600 sm:text-3xl">
           Seus patinhos estão prontos! 🎉
         </h2>
-        <p className="text-pretty font-body text-sm text-duck-700/80">
+        <p className="mx-auto mt-2 max-w-sm text-pretty font-body text-sm leading-relaxed text-duck-700/80">
           {segments.length} {segments.length === 1 ? "parte gerada" : "partes geradas"} — é
           só postar na ordem certinha (parte 01, 02, 03…).
         </p>
@@ -55,12 +55,12 @@ export default function ResultsView({ segments, onStartOver }: ResultsViewProps)
       <SaveTip mobile={env.mobile} ios={env.ios} canShare={env.canShare} />
 
       {/* Bulk actions */}
-      <div className="flex flex-col gap-2 sm:flex-row">
+      <div className="flex flex-col gap-2.5 sm:flex-row">
         {env.canShare && (
           <button
             type="button"
             onClick={handleShareAll}
-            className="flex-1 rounded-2xl bg-pond-500 px-4 py-3 font-display text-sm font-extrabold text-white shadow-pop transition-all hover:-translate-y-0.5 hover:bg-pond-400 active:translate-y-0.5 active:shadow-none"
+            className="btn-success flex-1 px-4 py-3 text-sm"
           >
             Compartilhar todas as partes 🦆
           </button>
@@ -70,7 +70,7 @@ export default function ResultsView({ segments, onStartOver }: ResultsViewProps)
           type="button"
           onClick={handleZip}
           disabled={zipProgress !== null}
-          className="flex-1 rounded-2xl bg-sky-500 px-4 py-3 font-display text-sm font-extrabold text-white shadow transition-all hover:-translate-y-0.5 hover:bg-sky-400 active:translate-y-0.5 disabled:cursor-wait disabled:opacity-80 disabled:hover:translate-y-0"
+          className="btn-info flex-1 px-4 py-3 text-sm disabled:cursor-wait disabled:opacity-80"
         >
           {zipProgress !== null
             ? `Empacotando… ${Math.round(zipProgress * 100)}%`
@@ -89,7 +89,7 @@ export default function ResultsView({ segments, onStartOver }: ResultsViewProps)
         <button
           type="button"
           onClick={onStartOver}
-          className="rounded-full px-5 py-2.5 font-display text-sm font-extrabold text-bill-600 underline decoration-wavy underline-offset-4 hover:text-bill-500"
+          className="btn-ghost rounded-full px-5 py-2.5 text-sm"
         >
           Fatiar outro vídeo
         </button>
@@ -123,11 +123,11 @@ function SaveTip({
   }
 
   return (
-    <div className="flex items-start gap-3 rounded-3xl bg-sky-200/60 px-4 py-3 ring-1 ring-sky-300/50">
-      <span className="text-lg" aria-hidden>
+    <div className="flex items-start gap-3 rounded-3xl bg-sky-200/60 px-4 py-3.5 ring-1 ring-sky-300/50 backdrop-blur-sm">
+      <span className="text-lg leading-none" aria-hidden>
         💡
       </span>
-      <p className="text-pretty font-body text-sm font-semibold text-sky-700">{text}</p>
+      <p className="text-pretty font-body text-sm font-semibold leading-relaxed text-sky-700">{text}</p>
     </div>
   );
 }
