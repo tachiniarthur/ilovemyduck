@@ -343,10 +343,10 @@ function Intro() {
       <div className="mx-auto mb-3 inline-flex">
         <DuckMascot size={72} mood="happy" />
       </div>
-      <h2 className="text-balance font-display text-[1.75rem] font-extrabold leading-[1.1] tracking-tight text-bill-600 sm:text-4xl">
+      <h2 className="text-balance font-display text-[2.5rem] font-extrabold leading-[1.04] tracking-tight text-bill-600 sm:text-[3.25rem]">
         Vídeo longo? Deixa que o patinho fatia! 🦆
       </h2>
-      <p className="mx-auto mt-3 max-w-md text-pretty font-body text-[0.95rem] leading-relaxed text-duck-700/80 sm:text-base">
+      <p className="mx-auto mt-4 max-w-md text-pretty font-body text-base leading-relaxed text-duck-700/80 sm:text-lg">
         Solte um vídeo e ele vira várias partes prontinhas para postar em
         sequência nos seus Stories. Sem editor complicado, sem enviar nada para
         servidor nenhum.

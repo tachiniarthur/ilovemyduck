@@ -59,9 +59,12 @@ body {
     @apply rounded-4xl bg-white/80 p-5 shadow-soft ring-1 ring-duck-200 backdrop-blur-sm sm:p-6;
   }
 
-  /* ---- Eyebrow / section titles -------------------------------------- */
+  /* ---- Section titles ------------------------------------------------- */
+  /* Display tier (one step below the hero): clearly larger than body so each
+     card announces itself. Part of a deliberate three-size scale —
+     display (hero / section titles) ≫ body ≫ caption. */
   .section-title {
-    @apply font-display text-lg font-extrabold leading-snug tracking-tight text-bill-600;
+    @apply font-display text-xl font-extrabold leading-snug tracking-tight text-bill-600 sm:text-2xl;
   }
 
   /* ---- Buttons -------------------------------------------------------- */

@@ -71,16 +71,16 @@ export default function UploadArea({ onFile, disabled }: UploadAreaProps) {
         <DuckMascot size={96} mood={isDragging ? "happy" : "waiting"} />
 
         <div className="space-y-1.5">
-          <p className="font-display text-xl font-extrabold leading-tight tracking-tight text-bill-600 sm:text-2xl">
+          <p className="font-display text-2xl font-extrabold leading-tight tracking-tight text-bill-600 sm:text-3xl">
             {isDragging ? "Pode soltar! 🦆" : "Quack! Solta o vídeo aqui"}
           </p>
-          <p className="font-body text-[0.95rem] leading-relaxed text-duck-700/80">
+          <p className="font-body text-base leading-relaxed text-duck-700/80 sm:text-lg">
             Arraste e solte ou{" "}
             <span className="font-bold text-bill-600 underline decoration-wavy underline-offset-2">
               toque para escolher
             </span>
           </p>
-          <p className="!mt-3 font-body text-xs font-medium tracking-wide text-duck-700/60">
+          <p className="!mt-3 font-body text-[0.8125rem] font-medium tracking-wide text-duck-700/60">
             Aceita MP4, MOV e WebM · tudo fica no seu aparelho
           </p>
         </div>
