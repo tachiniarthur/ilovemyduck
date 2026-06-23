@@ -23,11 +23,18 @@ body {
   text-rendering: optimizeLegibility;
 }
 
-/* Keep focus rings friendly and visible for keyboard users. */
+/* Keep focus rings friendly and visible for keyboard users. A two-tone ring
+   (white halo + orange) follows each element's own border-radius and stays
+   legible on both the light page and the saturated duck/bill buttons, where a
+   plain orange outline would vanish. The transparent outline keeps the focus
+   visible in Windows forced-colors / high-contrast mode, where box-shadows are
+   dropped. */
 :focus-visible {
-  outline: 3px solid #ff7a18;
+  outline: 2px solid transparent;
   outline-offset: 2px;
-  border-radius: 0.5rem;
+  box-shadow:
+    0 0 0 3px #fffbeb,
+    0 0 0 6px #ff7a18;
 }
 
 /* Respect users who prefer less motion. */

@@ -19,15 +19,13 @@ Fatie um vídeo longo em várias partes prontas para postar em sequência nos
   início preto/travado.
 - **Linha do tempo de cortes:** arraste, adicione ou remova os pontos de corte
   para não cortar no meio de uma fala.
-- Formato vertical **9:16** dos Stories com **preencher**, **fundo desfocado**
-  ou **cor sólida**, com prévia do resultado antes de processar.
-- **Numeração automática** das partes (selinho “1/4”, “2/4”…) no canto.
 - As partes vão **aparecendo conforme ficam prontas** (saída progressiva).
 - Cada parte vira um card com mini preview, número e duração, nomeada de forma
   ordenada (`i-love-my-duck-parte-01.mp4`, `-02`, …).
 
-> ⚡ **9:16 e numeração reencodam os quadros** (preset `veryfast`), então só
-> esses casos usam o caminho mais lento. O corte simples permanece instantâneo.
+> ⚡ Para inputs que o muxer de cópia não aceita (comum em `.mov` HEVC do
+> iPhone), há um **fallback** que reencoda cada parte para H.264/AAC mantendo o
+> enquadramento original. O corte simples por cópia permanece instantâneo.
 - **Salvar na galeria** via Web Share API no celular (iOS/Android) ou download
   no desktop. Também dá para baixar tudo em um **ZIP**.
 

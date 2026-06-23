@@ -36,7 +36,7 @@ export default function SegmentCard({ segment, saveMode }: SegmentCardProps) {
           controls
           playsInline
           preload="metadata"
-          className="aspect-[9/16] max-h-72 w-full bg-black object-contain"
+          className="aspect-video max-h-72 w-full bg-black object-contain"
         />
         <span className="absolute left-2 top-2 rounded-full bg-bill-500 px-2.5 py-1 font-display text-xs font-extrabold text-white shadow">
           Parte {String(segment.index).padStart(2, "0")}

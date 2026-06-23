@@ -46,19 +46,65 @@ export default function CutTimeline({
     [duration],
   );
 
+  // Clamp a cut to stay ordered and at least MIN_GAP away from its neighbours
+  // (and the video ends). Shared by both the drag and keyboard paths.
+  const clampCut = useCallback(
+    (index: number, time: number, list: number[]): number => {
+      const lower = index === 0 ? MIN_GAP : list[index - 1] + MIN_GAP;
+      const upper =
+        index === list.length - 1
+          ? duration - MIN_GAP
+          : list[index + 1] - MIN_GAP;
+      return Math.max(lower, Math.min(upper, time));
+    },
+    [duration],
+  );
+
+  const setCut = useCallback(
+    (index: number, time: number) => {
+      const next = [...sorted];
+      next[index] = Math.round(clampCut(index, time, sorted) * 100) / 100;
+      onChange(next);
+    },
+    [sorted, clampCut, onChange],
+  );
+
+  // Keyboard control for a focused handle: arrows nudge (Shift = bigger step),
+  // Home/End jump to the extremes, Delete/Backspace removes the cut.
+  const onHandleKeyDown = (e: React.KeyboardEvent, i: number) => {
+    if (disabled) return;
+    const step = e.shiftKey ? 5 : 1;
+    switch (e.key) {
+      case "ArrowLeft":
+      case "ArrowDown":
+        setCut(i, sorted[i] - step);
+        break;
+      case "ArrowRight":
+      case "ArrowUp":
+        setCut(i, sorted[i] + step);
+        break;
+      case "Home":
+        setCut(i, 0);
+        break;
+      case "End":
+        setCut(i, duration);
+        break;
+      case "Delete":
+      case "Backspace":
+        removeCut(i);
+        break;
+      default:
+        return; // let other keys (Tab, etc.) behave normally
+    }
+    e.preventDefault();
+  };
+
   // While dragging a handle, follow the pointer and keep cuts ordered + spaced.
   useEffect(() => {
     if (dragIndex === null) return;
 
     const move = (clientX: number) => {
-      let time = timeFromClientX(clientX);
-      const lower = dragIndex === 0 ? MIN_GAP : sorted[dragIndex - 1] + MIN_GAP;
-      const upper =
-        dragIndex === sorted.length - 1
-          ? duration - MIN_GAP
-          : sorted[dragIndex + 1] - MIN_GAP;
-      time = Math.max(lower, Math.min(upper, time));
-
+      const time = clampCut(dragIndex, timeFromClientX(clientX), sorted);
       const next = [...sorted];
       next[dragIndex] = Math.round(time * 100) / 100;
       onChange(next);
@@ -75,7 +121,7 @@ export default function CutTimeline({
       window.removeEventListener("pointerup", onPointerUp);
       window.removeEventListener("pointercancel", onPointerUp);
     };
-  }, [dragIndex, sorted, duration, onChange, timeFromClientX]);
+  }, [dragIndex, sorted, onChange, timeFromClientX, clampCut]);
 
   const removeCut = (i: number) => {
     if (disabled) return;
@@ -140,22 +186,32 @@ export default function CutTimeline({
               key={i}
               type="button"
               disabled={disabled}
+              role="slider"
+              aria-valuemin={0}
+              aria-valuemax={Math.round(duration)}
+              aria-valuenow={Math.round(time)}
+              aria-valuetext={`Ponto de corte ${i + 1} em ${formatDuration(time)}`}
+              aria-label={`Ponto de corte ${i + 1}`}
               onPointerDown={(e) => {
                 if (disabled) return;
                 e.preventDefault();
                 setDragIndex(i);
               }}
-              aria-label={`Ponto de corte ${i + 1} em ${formatDuration(time)}`}
-              className={`absolute top-0 h-full w-6 -translate-x-1/2 cursor-ew-resize touch-none
+              onKeyDown={(e) => onHandleKeyDown(e, i)}
+              className={`group absolute top-0 h-full w-6 -translate-x-1/2 cursor-ew-resize touch-none rounded-full
                 disabled:cursor-not-allowed`}
               style={{ left: `${(time / duration) * 100}%` }}
             >
               <span
                 className={`mx-auto block h-full w-1.5 rounded-full transition-colors ${
-                  dragIndex === i ? "bg-bill-600" : "bg-bill-500"
+                  dragIndex === i ? "bg-bill-600" : "bg-bill-500 group-hover:bg-bill-600"
                 }`}
               />
-              <span className="pointer-events-none absolute -top-1 left-1/2 h-4 w-4 -translate-x-1/2 rounded-full bg-bill-500 shadow ring-2 ring-white" />
+              <span
+                className={`pointer-events-none absolute -top-1 left-1/2 h-4 w-4 -translate-x-1/2 rounded-full bg-bill-500 shadow ring-2 ring-white transition-transform ${
+                  dragIndex === i ? "scale-125" : "group-hover:scale-110"
+                }`}
+              />
             </button>
           ))}
         </div>

@@ -5,7 +5,6 @@ import type {
   AppPhase,
   LoadedVideo,
   SegmentDuration,
-  VerticalMode,
   VideoSegment,
 } from "@/types";
 import { isAcceptedVideo, loadVideoMetadata } from "@/lib/video";
@@ -44,8 +43,6 @@ export default function Home() {
   const [phase, setPhase] = useState<AppPhase>("idle");
   const [video, setVideo] = useState<LoadedVideo | null>(null);
   const [segment, setSegment] = useState<SegmentDuration>(15);
-  const [vertical, setVertical] = useState<VerticalMode>("off");
-  const [numbering, setNumbering] = useState(false);
   const [cutTimes, setCutTimes] = useState<number[]>([]);
   const [segments, setSegments] = useState<VideoSegment[]>([]);
   const [progress, setProgress] = useState({ ratio: 0, message: "" });
@@ -142,7 +139,6 @@ export default function Home() {
 
   const handleSlice = useCallback(async () => {
     if (!video) return;
-    const willReencode = vertical !== "off" || numbering;
     setError(null);
     // Clear out any previous run before we start appending new parts live.
     revokeSegments();
@@ -154,16 +150,13 @@ export default function Home() {
       // Warm up the engine first (no real progress to report yet).
       await loadFFmpeg();
 
-      const sliceMessage = willReencode
-        ? "Reenquadrando e fatiando…"
-        : "Fatiando seu vídeo…";
+      const sliceMessage = "Fatiando seu vídeo…";
       setProgress({ ratio: 0, message: sliceMessage });
 
       const result = await sliceVideo({
         file: video.file,
         cutTimes,
         totalDuration: video.duration,
-        features: { vertical, numbering },
         onProgress: (ratio) => setProgress({ ratio, message: sliceMessage }),
         // Parts appear as they finish, so progress feels real.
         onSegment: (seg) => setSegments((prev) => [...prev, seg]),
@@ -205,32 +198,24 @@ export default function Home() {
               message:
                 "O motor de vídeo não carregou. Verifique sua conexão e tente de novo — se persistir, recarregue a página.",
             }
-          : isReencode
+          : isMemory
             ? {
-                title: "O patinho cansou de reenquadrar 🦆🪄",
+                title: "O patinho ficou sem fôlego 😵‍💫",
                 message:
-                  "O formato Stories (9:16) precisa redesenhar cada quadro, e isso ficou pesado demais para este navegador. " +
-                  "Tente cortes mais curtos (15s), um vídeo menor, ou desligue o 9:16 e use o corte simples (rapidíssimo). " +
-                  "No computador costuma voar.",
+                  "Esse vídeo foi pesado demais para a memória do navegador. Tente um vídeo menor, cortes maiores (60s), ou faça pelo computador.",
               }
-            : isMemory
-              ? {
-                  title: "O patinho ficou sem fôlego 😵‍💫",
-                  message:
-                    "Esse vídeo foi pesado demais para a memória do navegador. Tente um vídeo menor, cortes maiores (60s), ou faça pelo computador.",
-                }
-              : {
-                  title: "Algo deu errado no fatiamento 🦆",
-                  message:
-                    "Não consegui finalizar o corte. Tente novamente — se persistir, use um vídeo menor ou recarregue a página.",
-                };
+            : {
+                title: "Algo deu errado no fatiamento 🦆",
+                message:
+                  "Não consegui finalizar o corte. Tente novamente — se persistir, use um vídeo menor ou recarregue a página.",
+              };
       setError({ ...errorState, details });
       // Throw away any parts produced before the failure.
       revokeSegments();
       setSegments([]);
       setPhase("ready");
     }
-  }, [video, cutTimes, vertical, numbering, revokeSegments]);
+  }, [video, cutTimes, revokeSegments]);
 
   const partsCount = cutTimes.length + 1;
   const isProcessing = phase === "processing";
@@ -286,13 +271,8 @@ export default function Home() {
 
             <SegmentControls
               duration={video.duration}
-              videoUrl={video.url}
               segment={segment}
               onSegmentChange={handleSegmentChange}
-              vertical={vertical}
-              onVerticalChange={setVertical}
-              numbering={numbering}
-              onNumberingChange={setNumbering}
               cutTimes={cutTimes}
               onCutTimesChange={setCutTimes}
             />
@@ -300,7 +280,7 @@ export default function Home() {
             <button
               type="button"
               onClick={handleSlice}
-              className="w-full rounded-3xl bg-bill-500 px-6 py-4 font-display text-xl font-extrabold text-white shadow-soft-lg transition-all hover:bg-bill-400 active:translate-y-0.5 active:shadow-soft"
+              className="w-full rounded-3xl bg-bill-500 px-6 py-4 font-display text-xl font-extrabold tracking-tight text-white shadow-soft-lg transition-all hover:-translate-y-0.5 hover:bg-bill-400 active:translate-y-0.5 active:shadow-soft"
             >
               Fatiar em {partsCount} {partsCount === 1 ? "parte" : "partes"} 🔪🦆
             </button>
@@ -345,7 +325,7 @@ function LiveParts({ segments }: { segments: VideoSegment[] }) {
               muted
               playsInline
               preload="metadata"
-              className="aspect-[9/16] w-full bg-black object-contain"
+              className="aspect-video w-full bg-black object-contain"
             />
             <span className="absolute left-1.5 top-1.5 rounded-full bg-bill-500 px-2 py-0.5 font-display text-[10px] font-extrabold text-white shadow">
               {String(segment.index).padStart(2, "0")}
@@ -363,10 +343,10 @@ function Intro() {
       <div className="mx-auto mb-2 inline-flex">
         <DuckMascot size={72} mood="happy" />
       </div>
-      <h2 className="font-display text-2xl font-extrabold text-bill-600 sm:text-3xl">
+      <h2 className="text-balance font-display text-2xl font-extrabold tracking-tight text-bill-600 sm:text-3xl">
         Vídeo longo? Deixa que o patinho fatia! 🦆
       </h2>
-      <p className="mx-auto mt-2 max-w-md font-body text-sm text-duck-700/80 sm:text-base">
+      <p className="mx-auto mt-2 max-w-md text-pretty font-body text-sm text-duck-700/80 sm:text-base">
         Solte um vídeo e ele vira várias partes prontinhas para postar em
         sequência nos seus Stories. Sem editor complicado, sem enviar nada para
         servidor nenhum.

@@ -14,7 +14,7 @@ export default function ProcessingProgress({ ratio, message }: ProcessingProgres
     <div className="rounded-4xl bg-white/80 p-6 shadow-soft ring-1 ring-duck-200">
       <div className="flex flex-col items-center text-center">
         <DuckMascot size={96} mood="processing" />
-        <p className="mt-3 font-display text-xl font-extrabold text-bill-600">
+        <p className="mt-3 text-balance font-display text-xl font-extrabold tracking-tight text-bill-600">
           {message}
         </p>
         <p className="font-body text-sm text-duck-700/70">

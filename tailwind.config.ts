@@ -32,6 +32,9 @@ const config: Config = {
           300: "#8fd6ff",
           400: "#54bdff",
           500: "#2aa3f5",
+          // Darker steps for AA-legible text on the light sky tints.
+          600: "#1377b8",
+          700: "#0d567f",
         },
         pond: {
           // pond green

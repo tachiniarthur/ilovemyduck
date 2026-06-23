@@ -1,9 +1,7 @@
 import { FFmpeg } from "@ffmpeg/ffmpeg";
 import { fetchFile, toBlobURL } from "@ffmpeg/util";
-import type { SliceFeatures, VerticalMode, VideoSegment } from "@/types";
-import { needsReencode } from "@/types";
+import type { VideoSegment } from "@/types";
 import { partFileName, segmentsMeta } from "./format";
-import { buildPartBadge } from "./badge";
 
 // Single-threaded core. We deliberately do NOT use @ffmpeg/core-mt here:
 //   - The default slicing path is a pure stream copy, which is already near
@@ -85,7 +83,7 @@ export class CopySliceError extends Error {
   }
 }
 
-/** Thrown when a 9:16 re-encode part fails (bad command, OOM, codec, etc.). */
+/** Thrown when a re-encode fallback part fails (bad command, OOM, codec, etc.). */
 export class ReencodeError extends Error {
   /** Tail of the real ffmpeg log, for the console / bug reports. */
   readonly ffmpegLog: string;
@@ -183,7 +181,6 @@ export interface SliceOptions {
   /** Internal cut points (exclusive of 0 and total). Empty = single part. */
   cutTimes: number[];
   totalDuration: number;
-  features: SliceFeatures;
   onProgress?: ProgressHandler;
   /** Called as each part becomes ready, for progressive UI. */
   onSegment?: (segment: VideoSegment) => void;
@@ -199,15 +196,13 @@ export interface SliceOptions {
  * frame (no black intro) — at the cost of the boundary landing a little off the
  * exact requested time, which is irrelevant for Stories.
  *
- * Slow path: only taken when the user enables 9:16 framing or part numbering,
- * which require re-rendering frames. We then re-encode each part individually
- * (fast x264 preset) so we can stamp a per-part badge and reframe to 720x1280.
+ * Fallback path: only taken when the copy can't mux this input (common with
+ * iPhone .mov HEVC captures). We then re-encode each part individually to
+ * H.264/AAC (fast x264 preset), keeping the original framing — slower than copy,
+ * but it always produces playable MP4 parts.
  */
 export async function sliceVideo(options: SliceOptions): Promise<VideoSegment[]> {
   const instance = await loadFFmpeg(options.onLog);
-  if (needsReencode(options.features)) {
-    return reencodeSlices(instance, options);
-  }
 
   try {
     return await copySlices(instance, options);
@@ -215,10 +210,9 @@ export async function sliceVideo(options: SliceOptions): Promise<VideoSegment[]>
     if (!(err instanceof CopySliceError)) throw err;
     // The fast copy couldn't mux this input (common with iPhone .mov HEVC
     // captures). Fall back to a per-part H.264/AAC re-encode, which always fits
-    // the MP4 container. With vertical "off" + no numbering this re-encodes the
-    // original frames as-is (no reframing), just normalizing the codec — slower
-    // than copy, but it actually produces playable parts. The re-encode path
-    // carries its own watchdog/timeout, so it can't hang the UI either.
+    // the MP4 container. This re-encodes the original frames as-is, just
+    // normalizing the codec. The re-encode path carries its own
+    // watchdog/timeout, so it can't hang the UI either.
     console.warn(
       "[ffmpeg] cópia direta falhou, recorrendo ao re-encode:",
       err.message,
@@ -249,29 +243,42 @@ async function copySlices(
 
     const sorted = [...cutTimes].sort((a, b) => a - b);
 
-    // Map only the first video + (optional) audio track. iPhone .mov captures
-    // carry extra timed-metadata/data tracks that "-map 0" would also select;
-    // the MP4 segment muxer can't write those and fails the whole copy with a
-    // non-zero exit code. Selecting v+a keeps the output identical for normal
-    // videos while dropping the tracks that break muxing.
+    // Map ONLY the first video and the first audio track, explicitly. iPhone
+    // .mov captures routinely carry extra tracks beyond the obvious ones — a
+    // second "spatial audio" stream, timecode, or timed metadata. ffmpeg's
+    // default auto-mapping (and even "-map 0:a", which selects *every* audio
+    // stream) would pull in that second audio stream, whose codec ffmpeg can't
+    // identify ("Decoder (codec none) not found for input stream #0:2"), and
+    // the whole run aborts. Pinning to 0:v:0 + 0:a:0 keeps the output identical
+    // for normal videos while dropping the extra tracks that break muxing. The
+    // trailing "?" on the audio map makes a silent (audio-less) video still work.
+    const videoTag = (await probeIsHevc(instance, inputName))
+      ? // HEVC copies fine into MP4, but ffmpeg tags it "hev1" by default, which
+        // Apple players (Safari/iOS/QuickTime) refuse to decode. Forcing "hvc1"
+        // makes the copied part play everywhere — no re-encode needed.
+        ["-tag:v", "hvc1"]
+      : [];
+
     let code: number;
     if (sorted.length === 0) {
       // Single part — just copy the whole thing.
       console.info("[ffmpeg] copy (parte única)");
       code = await instance.exec([
         "-i", inputName,
-        "-c", "copy",
         "-map", "0:v:0",
-        "-map", "0:a?",
+        "-map", "0:a:0?",
+        "-c", "copy",
+        ...videoTag,
         "part_000.mp4",
       ]);
     } else {
       console.info("[ffmpeg] copy via segment muxer; cortes:", sorted);
       code = await instance.exec([
         "-i", inputName,
-        "-c", "copy",
         "-map", "0:v:0",
-        "-map", "0:a?",
+        "-map", "0:a:0?",
+        "-c", "copy",
+        ...videoTag,
         "-f", "segment",
         "-segment_times", sorted.join(","),
         "-reset_timestamps", "1",
@@ -291,6 +298,26 @@ async function copySlices(
   } finally {
     instance.off("progress", progressListener);
     await safeDelete(instance, inputName);
+  }
+}
+
+/**
+ * Probe whether the input's video stream is HEVC (h.265), without decoding.
+ * iPhone .mov captures are usually HEVC. We run ffmpeg with an input but no
+ * output: it demuxes the header, prints the stream info into our log ring, then
+ * exits non-zero (no output file) — which we ignore. We only care about the
+ * "Video: hevc" line it logged on the way out.
+ */
+async function probeIsHevc(instance: FFmpeg, inputName: string): Promise<boolean> {
+  try {
+    // No output file → ffmpeg exits with a non-zero code after dumping streams.
+    // That's expected; we read the codec from the captured log, not the code.
+    await instance.exec(["-hide_banner", "-i", inputName]);
+    return /Video:\s*hevc/i.test(recentLogTail(LOG_RING_SIZE));
+  } catch {
+    // The hvc1 tag is only an enhancement — never let a probe hiccup abort the
+    // copy. Worst case we skip the tag and the part still muxes.
+    return false;
   }
 }
 
@@ -333,11 +360,12 @@ async function collectSegments(
 }
 
 // ---------------------------------------------------------------------------
-// Slow path — per-part re-encode (9:16 framing and/or numbering).
+// Fallback path — per-part re-encode (codec normalization for inputs the copy
+// muxer rejects, e.g. iPhone .mov HEVC captures).
 // ---------------------------------------------------------------------------
 
-// Re-encoding 720x1280 with the single-thread libx264 is sub-realtime, so a
-// part legitimately takes a while — especially on phones. We never wait forever
+// Re-encoding with the single-thread libx264 is sub-realtime, so a part
+// legitimately takes a while — especially on phones. We never wait forever
 // though: the core's own timeout aborts a runaway encode (returning a non-zero
 // code), which we turn into a friendly error instead of an eternal 0% bar.
 // Budget scales with the part length, with a floor for very short parts.
@@ -410,7 +438,7 @@ function hardResetInstance(): void {
 
 async function reencodeSlices(
   instance: FFmpeg,
-  { file, cutTimes, totalDuration, features, onProgress, onSegment }: SliceOptions,
+  { file, cutTimes, totalDuration, onProgress, onSegment }: SliceOptions,
 ): Promise<VideoSegment[]> {
   const inputName = "input" + getExtension(file.name);
   const metas = segmentsMeta(cutTimes, totalDuration);
@@ -434,27 +462,17 @@ async function reencodeSlices(
       const meta = metas[i];
       const outName = `out_${String(i).padStart(3, "0")}.mp4`;
 
-      let badgeName: string | null = null;
-      if (features.numbering) {
-        badgeName = `badge_${i}.png`;
-        await instance.writeFile(badgeName, await buildPartBadge(i + 1, total));
-      }
-
       const args = buildReencodeArgs({
         inputName,
-        badgeName,
         outName,
         start: meta.start,
         duration: meta.duration,
-        vertical: features.vertical,
       });
 
       const label = `parte ${i + 1}/${total}`;
       const timeoutMs = partTimeoutMs(meta.duration);
       console.info(
-        `[ffmpeg] reencode ${label} (9:16=${features.vertical}, timeout=${Math.round(
-          timeoutMs / 1000,
-        )}s)`,
+        `[ffmpeg] reencode ${label} (timeout=${Math.round(timeoutMs / 1000)}s)`,
       );
 
       let code: number;
@@ -478,8 +496,7 @@ async function reencodeSlices(
         // A non-zero code here is almost always the core's timeout firing on a
         // sub-realtime encode, but it also covers any genuine command failure.
         throw new ReencodeTimeoutError(
-          `O reenquadramento 9:16 da ${label} não terminou a tempo ` +
-            `(código ${code}).`,
+          `O re-encode da ${label} não terminou a tempo (código ${code}).`,
           tail,
         );
       }
@@ -492,7 +509,6 @@ async function reencodeSlices(
       onSegment?.(segment);
 
       await safeDelete(instance, outName);
-      if (badgeName) await safeDelete(instance, badgeName);
       // Nudge the bar to the part boundary even if the encoder went quiet.
       onProgress?.(clamp01((i + 1) / total));
     }
@@ -506,33 +522,28 @@ async function reencodeSlices(
 
 interface ReencodeArgs {
   inputName: string;
-  badgeName: string | null;
   outName: string;
   start: number;
   duration: number;
-  vertical: VerticalMode;
 }
 
 function buildReencodeArgs(opts: ReencodeArgs): string[] {
-  const { inputName, badgeName, outName, start, duration, vertical } = opts;
-  const hasBadge = Boolean(badgeName);
-
-  const { filter, videoLabel } = buildFilterComplex(vertical, hasBadge);
+  const { inputName, outName, start, duration } = opts;
 
   // -ss before -i seeks fast to the nearest keyframe, then decodes to the exact
-  // point; -t bounds the output duration. Re-encoding makes the cut frame-exact.
-  const args: string[] = ["-ss", String(start), "-i", inputName];
-  if (badgeName) args.push("-i", badgeName);
-  args.push("-t", String(duration));
-
-  if (filter) {
-    args.push("-filter_complex", filter, "-map", videoLabel);
-  } else {
-    args.push("-map", "0:v:0");
-  }
-
-  args.push(
-    "-map", "0:a?",
+  // point; -t bounds the output duration. Re-encoding makes the cut frame-exact
+  // while normalizing the codec to H.264/AAC so the MP4 container always accepts
+  // it. The original framing is preserved (no scaling/cropping).
+  return [
+    "-ss", String(start),
+    "-i", inputName,
+    "-t", String(duration),
+    // Same explicit single-stream mapping as the copy path: take only the first
+    // video + first audio track, so iPhone .mov spatial-audio/metadata streams
+    // never reach the encoder (which has no decoder for them). "?" keeps it
+    // working for silent videos.
+    "-map", "0:v:0",
+    "-map", "0:a:0?",
     "-c:v", "libx264",
     // ultrafast is ~2x faster than veryfast on the single-thread wasm core,
     // which is the difference between "usable on a phone" and "stuck at 0%".
@@ -543,59 +554,7 @@ function buildReencodeArgs(opts: ReencodeArgs): string[] {
     "-b:a", "128k",
     "-movflags", "+faststart",
     outName,
-  );
-
-  return args;
-}
-
-/**
- * Build the filter_complex for the re-encode path, returning the chain plus the
- * label of the final video stream to map. Targets a 720x1280 (9:16) canvas —
- * the real display size for Stories, ~2.25x fewer pixels than 1080x1920, which
- * roughly halves the single-thread encode time with no perceptible loss.
- */
-function buildFilterComplex(
-  vertical: VerticalMode,
-  hasBadge: boolean,
-): { filter: string | null; videoLabel: string } {
-  const steps: string[] = [];
-  let label: string;
-
-  if (vertical === "off") {
-    label = "0:v:0";
-  } else if (vertical === "fill") {
-    steps.push(
-      "[0:v]scale=720:1280:force_original_aspect_ratio=increase,crop=720:1280[v]",
-    );
-    label = "[v]";
-  } else if (vertical === "color") {
-    steps.push(
-      "[0:v]scale=720:1280:force_original_aspect_ratio=decrease," +
-        "pad=720:1280:(ow-iw)/2:(oh-ih)/2:color=0xbfe7ff[v]",
-    );
-    label = "[v]";
-  } else {
-    // "blur": a blurred copy of the video as the backdrop. The background is
-    // *blurred anyway*, so we build it at a tiny resolution (cheap boxblur) and
-    // upscale — visually identical to blurring at full size, but far cheaper.
-    steps.push(
-      "[0:v]split=2[bg][fg]",
-      "[bg]scale=180:320:force_original_aspect_ratio=increase,crop=180:320," +
-        "boxblur=8:1,scale=720:1280[bgb]",
-      "[fg]scale=720:1280:force_original_aspect_ratio=decrease[fgs]",
-      "[bgb][fgs]overlay=(W-w)/2:(H-h)/2[v]",
-    );
-    label = "[v]";
-  }
-
-  if (hasBadge) {
-    // Discreet top-right placement, relative to the 720-wide canvas.
-    const base = label === "0:v:0" ? "[0:v]" : label;
-    steps.push(`${base}[1:v]overlay=W-w-36:36[vout]`);
-    label = "[vout]";
-  }
-
-  return { filter: steps.length > 0 ? steps.join(";") : null, videoLabel: label };
+  ];
 }
 
 // ---------------------------------------------------------------------------
