@@ -8,9 +8,8 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        // The duck palette 🦆
+        // The duck palette 🦆 — kept intact, used with intention.
         duck: {
-          // duck yellow
           50: "#fffbeb",
           100: "#fff3c4",
           200: "#ffe588",
@@ -21,90 +20,109 @@ const config: Config = {
           700: "#a86d00",
         },
         bill: {
-          // bill orange
+          // Burnt / bill orange — the accent + title colour. Used sparingly.
           400: "#ff9d4d",
-          500: "#ff7a18", // bill orange
-          600: "#ed5e00",
-          // Deep roasted-bill tone for AA-legible text on the yellow chips.
-          700: "#b84800",
+          500: "#ff7a18",
+          600: "#ed5e00", // primary accent for titles & CTAs
+          700: "#b84800", // AA-legible orange text on light tints
         },
         sky: {
-          // sky blue
           200: "#bfe7ff",
           300: "#8fd6ff",
           400: "#54bdff",
           500: "#2aa3f5",
-          // Darker steps for AA-legible text on the light sky tints.
           600: "#1377b8",
           700: "#0d567f",
         },
         pond: {
-          // pond green
           300: "#9be7c4",
           400: "#5fd6a0",
           500: "#2bbd86",
           600: "#1c9a6c",
+          700: "#127853",
+        },
+        // ---- Warm neutral layer (the professionalism) -------------------
+        // A cream canvas, a warm near-black ink for real type hierarchy, and
+        // a taupe "bark" scale for muted copy, borders and surfaces. This is
+        // what stops the UI from reading as "everything is yellow-brown".
+        cream: {
+          50: "#fffdf8",
+          100: "#fff8ee",
+          200: "#fdf1e1",
+        },
+        ink: {
+          DEFAULT: "#241a12", // headings / strong body
+          soft: "#43382c", // standard body
+          muted: "#6d6052", // secondary copy
+        },
+        bark: {
+          100: "#f3ece1",
+          200: "#e9ddca", // hairline borders
+          300: "#dccab0",
+          400: "#bda88c",
+          500: "#8c7a64",
+          600: "#5f5142",
+          700: "#473b2e",
         },
       },
       fontFamily: {
-        display: ["var(--font-display)", "system-ui", "sans-serif"],
+        display: ["var(--font-display)", "Georgia", "serif"],
         body: ["var(--font-body)", "system-ui", "sans-serif"],
+        mono: ["var(--font-mono)", "ui-monospace", "monospace"],
+      },
+      fontSize: {
+        // Fluid display tiers with a confident jump between each.
+        "display-xl": [
+          "clamp(2.5rem, 1.6rem + 4.2vw, 4.25rem)",
+          { lineHeight: "1.02", letterSpacing: "-0.02em" },
+        ],
+        "display-lg": [
+          "clamp(1.9rem, 1.4rem + 2.4vw, 2.75rem)",
+          { lineHeight: "1.08", letterSpacing: "-0.018em" },
+        ],
+        eyebrow: [
+          "0.75rem",
+          { lineHeight: "1", letterSpacing: "0.18em" },
+        ],
       },
       borderRadius: {
+        // Contained, grown-up corners — no blobby 5xl.
+        button: "0.75rem",
+        card: "1.15rem",
+        field: "0.7rem",
         "4xl": "2rem",
-        "5xl": "2.75rem",
       },
       boxShadow: {
-        soft: "0 10px 30px -12px rgba(247, 181, 0, 0.45)",
-        "soft-lg": "0 24px 60px -20px rgba(237, 94, 0, 0.35)",
-        pop: "0 6px 0 0 rgba(216, 148, 0, 1)",
+        // Soft, layered elevation only. The hard "game button" drop is gone.
+        button: "0 1px 2px rgba(54, 35, 12, 0.10), 0 1px 1px rgba(54, 35, 12, 0.04)",
+        accent: "0 6px 18px -6px rgba(237, 94, 0, 0.45), 0 2px 4px rgba(237, 94, 0, 0.18)",
+        "accent-lg": "0 14px 32px -10px rgba(237, 94, 0, 0.50)",
+        card: "0 1px 3px rgba(60, 42, 16, 0.05), 0 10px 30px -16px rgba(60, 42, 16, 0.20)",
+        "card-lift": "0 2px 6px rgba(60, 42, 16, 0.06), 0 22px 48px -22px rgba(60, 42, 16, 0.28)",
+        field: "inset 0 1px 2px rgba(54, 35, 12, 0.05)",
       },
       keyframes: {
         "float-slow": {
           "0%, 100%": { transform: "translateY(0)" },
-          "50%": { transform: "translateY(-10px)" },
+          "50%": { transform: "translateY(-8px)" },
         },
-        "bob": {
-          "0%, 100%": { transform: "translateY(0) rotate(-1.5deg)" },
-          "50%": { transform: "translateY(-6px) rotate(1.5deg)" },
-        },
-        "waddle": {
-          "0%, 100%": { transform: "rotate(-4deg)" },
-          "50%": { transform: "rotate(4deg)" },
-        },
-        "ripple": {
-          "0%": { transform: "scale(0.6)", opacity: "0.7" },
-          "100%": { transform: "scale(2.2)", opacity: "0" },
-        },
-        "bubble-up": {
-          "0%": { transform: "translateY(0) scale(1)", opacity: "0" },
-          "20%": { opacity: "0.8" },
-          "100%": { transform: "translateY(-120px) scale(0.4)", opacity: "0" },
+        "fade-up": {
+          "0%": { opacity: "0", transform: "translateY(16px)" },
+          "100%": { opacity: "1", transform: "translateY(0)" },
         },
         "pop-in": {
-          "0%": { transform: "scale(0.7)", opacity: "0" },
-          "70%": { transform: "scale(1.06)", opacity: "1" },
+          "0%": { transform: "scale(0.94)", opacity: "0" },
           "100%": { transform: "scale(1)", opacity: "1" },
         },
-        "celebrate": {
-          "0%, 100%": { transform: "translateY(0) rotate(0)" },
-          "25%": { transform: "translateY(-14px) rotate(-6deg)" },
-          "50%": { transform: "translateY(0) rotate(0)" },
-          "75%": { transform: "translateY(-8px) rotate(6deg)" },
-        },
-        "shimmer": {
+        shimmer: {
           "100%": { transform: "translateX(100%)" },
         },
       },
       animation: {
-        "float-slow": "float-slow 4s ease-in-out infinite",
-        "bob": "bob 2.6s ease-in-out infinite",
-        "waddle": "waddle 0.5s ease-in-out infinite",
-        "ripple": "ripple 2.4s ease-out infinite",
-        "bubble-up": "bubble-up 3s ease-in infinite",
-        "pop-in": "pop-in 0.45s cubic-bezier(0.34, 1.56, 0.64, 1) both",
-        "celebrate": "celebrate 1.1s ease-in-out infinite",
-        "shimmer": "shimmer 1.6s infinite",
+        "float-slow": "float-slow 6s ease-in-out infinite",
+        "fade-up": "fade-up 0.6s cubic-bezier(0.22, 0.61, 0.36, 1) both",
+        "pop-in": "pop-in 0.35s cubic-bezier(0.22, 0.61, 0.36, 1) both",
+        shimmer: "shimmer 1.6s infinite",
       },
     },
   },

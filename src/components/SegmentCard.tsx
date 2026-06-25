@@ -4,6 +4,7 @@ import { useState } from "react";
 import type { VideoSegment } from "@/types";
 import { formatDuration } from "@/lib/format";
 import { saveSegment } from "@/lib/share";
+import Icon from "./Icon";
 
 interface SegmentCardProps {
   segment: VideoSegment;
@@ -25,30 +26,30 @@ export default function SegmentCard({ segment, saveMode }: SegmentCardProps) {
     }
   };
 
-  const label =
-    saveMode === "share" ? "Salvar na galeria" : "Baixar parte";
+  const label = saveMode === "share" ? "Salvar na galeria" : "Baixar parte";
 
   return (
-    <div className="animate-pop-in overflow-hidden rounded-3xl bg-white shadow-soft ring-1 ring-duck-200 transition-[transform,box-shadow] duration-200 ease-[var(--ease-soft)] hover:-translate-y-0.5 hover:shadow-soft-lg">
-      <div className="relative bg-black">
+    <div className="card animate-pop-in overflow-hidden p-0 transition-shadow duration-200 ease-[var(--ease-soft)] hover:shadow-card-lift">
+      <div className="relative bg-ink">
         <video
           src={segment.url}
           controls
           playsInline
           preload="metadata"
-          className="aspect-video max-h-72 w-full bg-black object-contain"
+          className="aspect-video max-h-72 w-full bg-ink object-contain"
         />
-        <span className="absolute left-2 top-2 rounded-full bg-bill-500 px-2.5 py-1 font-display text-xs font-extrabold text-white shadow ring-1 ring-white/30">
+        <span className="absolute left-2 top-2 rounded-md bg-bill-600 px-2 py-0.5 font-mono text-xs font-medium text-white shadow ring-1 ring-white/20">
           Parte {String(segment.index).padStart(2, "0")}
         </span>
       </div>
 
       <div className="p-3">
         <div className="flex items-center justify-between gap-2">
-          <p className="shrink-0 font-body text-xs font-semibold text-duck-700/80">
-            ⏱ {formatDuration(segment.duration)}
+          <p className="inline-flex shrink-0 items-center gap-1 font-mono text-xs text-ink-soft">
+            <Icon name="clock" size={12} />
+            {formatDuration(segment.duration)}
           </p>
-          <p className="min-w-0 truncate font-body text-[10px] tracking-wide text-duck-700/50">
+          <p className="min-w-0 truncate font-mono text-[10px] tracking-wide text-bark-400">
             {segment.fileName}
           </p>
         </div>
@@ -60,12 +61,15 @@ export default function SegmentCard({ segment, saveMode }: SegmentCardProps) {
           className={`btn mt-2.5 w-full px-3 py-2.5 text-sm disabled:cursor-wait disabled:opacity-80
             ${
               status === "saved"
-                ? "bg-pond-500 text-white shadow-pop"
+                ? "bg-pond-600 text-white shadow-button"
                 : status === "error"
-                  ? "bg-bill-600 text-white shadow"
-                  : "bg-duck-400 text-bill-700 shadow-pop hover:bg-duck-300 active:translate-y-0.5 active:shadow-none"
+                  ? "bg-bill-600 text-white shadow-button"
+                  : "border border-bark-200 bg-cream-50 text-ink shadow-button hover:border-bark-300 hover:bg-cream-100"
             }`}
         >
+          {status !== "saving" && status !== "error" && (
+            <Icon name={saveMode === "share" ? "stories" : "download"} size={16} />
+          )}
           {status === "saving"
             ? "Mandando o patinho…"
             : status === "saved"

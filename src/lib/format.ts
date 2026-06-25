@@ -44,7 +44,7 @@ export function partsSentence(duration: number, segment: SegmentDuration): strin
 }
 
 /**
- * Internal cut points (exclusive of 0 and the end) for a uniform split — the
+ * Internal cut points (exclusive of 0 and the end) for a uniform split, the
  * starting layout the user can then fine-tune on the timeline.
  */
 export function defaultCutTimes(duration: number, segment: SegmentDuration): number[] {

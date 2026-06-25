@@ -5,7 +5,7 @@ import { partFileName, segmentsMeta } from "./format";
 
 // Single-threaded core. We deliberately do NOT use @ffmpeg/core-mt here:
 //   - The default slicing path is a pure stream copy, which is already near
-//     instant on the single-thread core — multi-threading buys nothing there.
+//     instant on the single-thread core, multi-threading buys nothing there.
 //   - The MT core spawns a pool of pthread workers during load. When that pool
 //     fails to initialize the FFmpeg class never receives a "load" message back
 //     and never rejects either (it has no onerror/timeout), so the UI hangs at
@@ -53,7 +53,7 @@ function recentLogTail(lines = 14): string {
 /**
  * The tail of the most recent ffmpeg log lines, for surfacing the *real* engine
  * error in the UI. Used by the copy path (and any failure that doesn't carry its
- * own log), so that — even on iOS Safari, where the dev console is out of reach —
+ * own log), so that, even on iOS Safari, where the dev console is out of reach,
  * the actual ffmpeg message is visible on screen.
  */
 export function getRecentFFmpegLog(lines = 14): string {
@@ -71,7 +71,7 @@ export class FFmpegLoadError extends Error {
 /**
  * Thrown when the fast stream-copy path fails (e.g. an iPhone .mov whose video
  * codec/keyframe layout the MP4 segment muxer won't copy). It carries the real
- * ffmpeg log tail and is caught internally to trigger the re-encode fallback —
+ * ffmpeg log tail and is caught internally to trigger the re-encode fallback,
  * it should never reach the UI on its own.
  */
 export class CopySliceError extends Error {
@@ -193,12 +193,12 @@ export interface SliceOptions {
  * Fast path (default): a pure stream COPY through the segment muxer. No frames
  * are re-encoded, so even a 10-minute video splits in a couple of seconds. The
  * muxer cuts on the nearest keyframe, so each part already starts on a valid
- * frame (no black intro) — at the cost of the boundary landing a little off the
+ * frame (no black intro), at the cost of the boundary landing a little off the
  * exact requested time, which is irrelevant for Stories.
  *
  * Fallback path: only taken when the copy can't mux this input (common with
  * iPhone .mov HEVC captures). We then re-encode each part individually to
- * H.264/AAC (fast x264 preset), keeping the original framing — slower than copy,
+ * H.264/AAC (fast x264 preset), keeping the original framing, slower than copy,
  * but it always produces playable MP4 parts.
  */
 export async function sliceVideo(options: SliceOptions): Promise<VideoSegment[]> {
@@ -223,7 +223,7 @@ export async function sliceVideo(options: SliceOptions): Promise<VideoSegment[]>
 }
 
 // ---------------------------------------------------------------------------
-// Fast path — stream copy via the segment muxer.
+// Fast path, stream copy via the segment muxer.
 // ---------------------------------------------------------------------------
 
 async function copySlices(
@@ -244,7 +244,7 @@ async function copySlices(
     const sorted = [...cutTimes].sort((a, b) => a - b);
 
     // Map ONLY the first video and the first audio track, explicitly. iPhone
-    // .mov captures routinely carry extra tracks beyond the obvious ones — a
+    // .mov captures routinely carry extra tracks beyond the obvious ones, a
     // second "spatial audio" stream, timecode, or timed metadata. ffmpeg's
     // default auto-mapping (and even "-map 0:a", which selects *every* audio
     // stream) would pull in that second audio stream, whose codec ffmpeg can't
@@ -255,13 +255,13 @@ async function copySlices(
     const videoTag = (await probeIsHevc(instance, inputName))
       ? // HEVC copies fine into MP4, but ffmpeg tags it "hev1" by default, which
         // Apple players (Safari/iOS/QuickTime) refuse to decode. Forcing "hvc1"
-        // makes the copied part play everywhere — no re-encode needed.
+        // makes the copied part play everywhere, no re-encode needed.
         ["-tag:v", "hvc1"]
       : [];
 
     let code: number;
     if (sorted.length === 0) {
-      // Single part — just copy the whole thing.
+      // Single part, just copy the whole thing.
       console.info("[ffmpeg] copy (parte única)");
       code = await instance.exec([
         "-i", inputName,
@@ -305,7 +305,7 @@ async function copySlices(
  * Probe whether the input's video stream is HEVC (h.265), without decoding.
  * iPhone .mov captures are usually HEVC. We run ffmpeg with an input but no
  * output: it demuxes the header, prints the stream info into our log ring, then
- * exits non-zero (no output file) — which we ignore. We only care about the
+ * exits non-zero (no output file), which we ignore. We only care about the
  * "Video: hevc" line it logged on the way out.
  */
 async function probeIsHevc(instance: FFmpeg, inputName: string): Promise<boolean> {
@@ -315,7 +315,7 @@ async function probeIsHevc(instance: FFmpeg, inputName: string): Promise<boolean
     await instance.exec(["-hide_banner", "-i", inputName]);
     return /Video:\s*hevc/i.test(recentLogTail(LOG_RING_SIZE));
   } catch {
-    // The hvc1 tag is only an enhancement — never let a probe hiccup abort the
+    // The hvc1 tag is only an enhancement, never let a probe hiccup abort the
     // copy. Worst case we skip the tag and the part still muxes.
     return false;
   }
@@ -337,7 +337,7 @@ async function collectSegments(
   console.info("[ffmpeg] partes geradas:", partNames);
   if (partNames.length === 0) {
     throw new CopySliceError(
-      "Nenhum segmento foi gerado — o muxer não produziu nenhum arquivo de saída.",
+      "Nenhum segmento foi gerado, o muxer não produziu nenhum arquivo de saída.",
       recentLogTail(),
     );
   }
@@ -360,12 +360,12 @@ async function collectSegments(
 }
 
 // ---------------------------------------------------------------------------
-// Fallback path — per-part re-encode (codec normalization for inputs the copy
+// Fallback path, per-part re-encode (codec normalization for inputs the copy
 // muxer rejects, e.g. iPhone .mov HEVC captures).
 // ---------------------------------------------------------------------------
 
 // Re-encoding with the single-thread libx264 is sub-realtime, so a part
-// legitimately takes a while — especially on phones. We never wait forever
+// legitimately takes a while, especially on phones. We never wait forever
 // though: the core's own timeout aborts a runaway encode (returning a non-zero
 // code), which we turn into a friendly error instead of an eternal 0% bar.
 // Budget scales with the part length, with a floor for very short parts.
@@ -424,13 +424,13 @@ async function execWithWatchdog(
 
 /**
  * Tear down a wedged engine so the next operation reloads a fresh one. Called
- * only after the watchdog fires — the worker is assumed unusable at that point.
+ * only after the watchdog fires, the worker is assumed unusable at that point.
  */
 function hardResetInstance(): void {
   try {
     ffmpeg?.terminate();
   } catch {
-    // ignore — best effort
+    // ignore, best effort
   }
   ffmpeg = null;
   loadPromise = null;
@@ -584,7 +584,7 @@ async function safeDelete(instance: FFmpeg, name: string): Promise<void> {
   try {
     await instance.deleteFile(name);
   } catch {
-    // ignore — file may already be gone
+    // ignore, file may already be gone
   }
 }
 

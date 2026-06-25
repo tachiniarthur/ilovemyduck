@@ -5,17 +5,8 @@
 :root {
   color-scheme: light;
 
-  /* ---- Motion tokens -------------------------------------------------- */
-  /* A springy "duck bounce" for playful entrances, plus a calm standard
-     curve for everyday hover/press feedback. Centralizing them keeps every
-     interactive element moving with the same personality. */
-  --ease-duck: cubic-bezier(0.34, 1.56, 0.64, 1);
+  /* Motion curves, one calm standard easing for everything interactive. */
   --ease-soft: cubic-bezier(0.22, 0.61, 0.36, 1);
-
-  /* ---- Vertical rhythm ------------------------------------------------ */
-  /* One knob for the gap between major stacked blocks so the whole flow
-     breathes consistently across phases. */
-  --stack-gap: 1.25rem;
 }
 
 html,
@@ -24,99 +15,159 @@ body {
 }
 
 body {
-  /* A soft sky-to-pond gradient with gentle water ripples at the bottom. */
-  background-color: #fffbeb;
+  /* A warm cream canvas with a single, restrained light mesh, the duck
+     gradient kept, but toned right down so it reads as paper, not a poster. */
+  background-color: #fffaf2;
   background-image:
-    radial-gradient(120% 80% at 50% -10%, #bfe7ff 0%, rgba(191, 231, 255, 0) 55%),
-    radial-gradient(90% 60% at 110% 110%, rgba(95, 214, 160, 0.35) 0%, rgba(95, 214, 160, 0) 60%),
-    radial-gradient(90% 60% at -10% 110%, rgba(247, 181, 0, 0.25) 0%, rgba(247, 181, 0, 0) 60%);
+    radial-gradient(105% 70% at 50% -15%, rgba(191, 231, 255, 0.45) 0%, rgba(191, 231, 255, 0) 55%),
+    radial-gradient(80% 55% at 108% 8%, rgba(95, 214, 160, 0.16) 0%, rgba(95, 214, 160, 0) 60%),
+    radial-gradient(75% 50% at -8% 4%, rgba(247, 181, 0, 0.14) 0%, rgba(247, 181, 0, 0) 60%);
   background-attachment: fixed;
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
 }
 
-/* Keep focus rings friendly and visible for keyboard users. A two-tone ring
-   (white halo + orange) follows each element's own border-radius and stays
-   legible on both the light page and the saturated duck/bill buttons, where a
-   plain orange outline would vanish. The transparent outline keeps the focus
-   visible in Windows forced-colors / high-contrast mode, where box-shadows are
-   dropped. */
+/* Friendly, always-visible keyboard focus. A two-tone ring (cream halo +
+   orange) follows each element's radius and survives on both the light page
+   and the saturated buttons. The transparent outline keeps focus visible in
+   forced-colors / high-contrast mode where box-shadows are dropped. */
 :focus-visible {
   outline: 2px solid transparent;
   outline-offset: 2px;
   box-shadow:
-    0 0 0 3px #fffbeb,
-    0 0 0 6px #ff7a18;
+    0 0 0 3px #fffaf2,
+    0 0 0 5px #ed5e00;
+}
+
+@layer base {
+  ::selection {
+    background: rgba(255, 122, 24, 0.22);
+  }
 }
 
 @layer components {
-  /* ---- Surfaces ------------------------------------------------------- */
-  /* The single source of truth for the floating "pond foam" panels. Every
-     card (preview, controls, progress, results) shares the same radius,
-     translucency, ring and shadow so the screen reads as one set, not a
-     pile of slightly-different boxes. */
-  .duck-card {
-    @apply rounded-4xl bg-white/80 p-5 shadow-soft ring-1 ring-duck-200 backdrop-blur-sm sm:p-6;
+  /* ---- Layout ---------------------------------------------------------- */
+  .container-page {
+    @apply mx-auto w-full max-w-6xl px-5 sm:px-8;
   }
 
-  /* ---- Section titles ------------------------------------------------- */
-  /* Display tier (one step below the hero): clearly larger than body so each
-     card announces itself. Part of a deliberate three-size scale —
-     display (hero / section titles) ≫ body ≫ caption. */
+  /* Small uppercase mono label that sits above section titles, the quiet
+     "serious product" tag that gives each block a confident opening. */
+  .eyebrow {
+    @apply inline-flex items-center gap-2 font-mono text-eyebrow font-medium uppercase text-bill-700;
+  }
+
+  /* In-card heading for the tool (one step below the page display tiers). */
   .section-title {
-    @apply font-display text-xl font-extrabold leading-snug tracking-tight text-bill-600 sm:text-2xl;
+    @apply font-display text-lg font-semibold leading-snug text-ink sm:text-xl;
   }
 
-  /* ---- Buttons -------------------------------------------------------- */
-  /* Shared base: consistent press physics, transitions and disabled
-     handling so no two buttons feel different by accident. */
+  /* ---- Surfaces -------------------------------------------------------- */
+  /* The single source of truth for panels: soft border, soft shadow, no
+     blobby radius. Everything that floats shares this so the UI reads as one
+     set of cards, not a pile of mismatched boxes. */
+  .card {
+    @apply rounded-card border border-bark-200 bg-cream-50/90 shadow-card backdrop-blur-sm;
+  }
+
+  /* ---- Buttons --------------------------------------------------------- */
+  /* Shared base: contained radius, soft transitions, no hard "game" drop. */
   .btn {
-    @apply inline-flex items-center justify-center gap-2 rounded-2xl font-display font-extrabold
-      transition-[transform,background-color,box-shadow,color] duration-200 ease-[var(--ease-soft)]
-      disabled:cursor-not-allowed disabled:opacity-60;
+    @apply inline-flex select-none items-center justify-center gap-2 rounded-button font-body
+      font-bold leading-none transition-[transform,background-color,box-shadow,border-color,color]
+      duration-200 ease-[var(--ease-soft)] disabled:cursor-not-allowed disabled:opacity-55;
   }
 
-  /* Primary call to action — the one thing we most want tapped. Bill orange
-     is reserved for this role so it always reads as "the next step". */
+  /* The one accent action per view. Burnt orange, soft tinted shadow, a
+     barely-there lift on hover, mature, not a pressable toy. */
   .btn-primary {
-    @apply btn bg-bill-500 text-white shadow-soft-lg
-      hover:-translate-y-0.5 hover:bg-bill-400
-      active:translate-y-0.5 active:shadow-soft
-      disabled:hover:translate-y-0;
+    @apply btn bg-bill-600 text-white shadow-accent
+      hover:-translate-y-px hover:bg-bill-500 hover:shadow-accent-lg
+      active:translate-y-0 active:shadow-accent
+      disabled:hover:translate-y-0 disabled:hover:shadow-accent;
   }
 
-  /* Confirm / success-leaning action (e.g. sending parts off to the gallery). */
+  /* Quiet, grown-up secondary: paper surface, hairline border, cream hover. */
+  .btn-secondary {
+    @apply btn border border-bark-200 bg-cream-50 text-ink shadow-button
+      hover:-translate-y-px hover:border-bark-300 hover:bg-cream-100
+      active:translate-y-0 disabled:hover:translate-y-0;
+  }
+
+  /* Success-leaning confirm (e.g. sending parts to the gallery). */
   .btn-success {
-    @apply btn bg-pond-500 text-white shadow-pop
-      hover:-translate-y-0.5 hover:bg-pond-400
-      active:translate-y-0.5 active:shadow-none
-      disabled:hover:translate-y-0;
+    @apply btn bg-pond-600 text-white shadow-button
+      hover:-translate-y-px hover:bg-pond-500
+      active:translate-y-0 disabled:hover:translate-y-0;
   }
 
-  /* Calm secondary action (e.g. download a ZIP) — present but never competing
-     with the primary CTA. */
-  .btn-info {
-    @apply btn bg-sky-500 text-white shadow-soft
-      hover:-translate-y-0.5 hover:bg-sky-400
-      active:translate-y-0.5 active:shadow-none
-      disabled:hover:translate-y-0;
-  }
-
-  /* Yellow "chip" action — the friendly, repeatable tap (per-part save,
-     add cut). Uses the chunky pop shadow for a tactile, toy-like press. */
-  .btn-chip {
-    @apply btn bg-duck-400 text-bill-700 shadow-pop
-      hover:bg-duck-300 active:translate-y-0.5 active:shadow-none;
-  }
-
-  /* Low-emphasis text action with the playful wavy underline. */
+  /* Low-emphasis text action. */
   .btn-ghost {
-    @apply btn text-bill-600 underline decoration-wavy underline-offset-4
-      hover:text-bill-500 active:translate-y-0.5;
+    @apply btn text-bill-700 hover:text-bill-600 hover:underline underline-offset-4;
+  }
+
+  /* ---- Form fields ----------------------------------------------------- */
+  .field-label {
+    @apply mb-1.5 block font-body text-sm font-semibold text-ink-soft;
+  }
+
+  .field-input {
+    @apply w-full rounded-field border border-bark-200 bg-cream-50 px-3.5 py-2.5 font-body
+      text-[0.95rem] text-ink shadow-field placeholder:text-bark-400
+      transition-[border-color,box-shadow] duration-200 ease-[var(--ease-soft)]
+      hover:border-bark-300 focus:border-bill-500;
+  }
+
+  /* Field flagged invalid by the visual-only validation. */
+  .field-input-error {
+    @apply border-bill-600/70 bg-bill-500/[0.04];
   }
 }
 
-/* Respect users who prefer less motion. */
+@layer utilities {
+  /* ---- Signature: the slice line -------------------------------------- */
+  /* A perforated cut, film-strip / ticket-stub dashes, that recurs as a
+     divider and decorative rail. It comes straight from "fatiar", so it can
+     never read as a generic SaaS flourish. */
+  .slice-line {
+    height: 2px;
+    background-image: linear-gradient(
+      to right,
+      rgba(184, 72, 0, 0.55) 0 14px,
+      transparent 14px 26px
+    );
+    background-repeat: repeat-x;
+    background-size: 26px 2px;
+  }
+  .slice-line-v {
+    width: 2px;
+    background-image: linear-gradient(
+      to bottom,
+      rgba(184, 72, 0, 0.4) 0 10px,
+      transparent 10px 20px
+    );
+    background-repeat: repeat-y;
+    background-size: 2px 20px;
+  }
+
+  /* ---- Scroll reveal --------------------------------------------------- */
+  /* Paired with the <Reveal> wrapper: hidden until it enters the viewport,
+     then a single soft rise. One subtle entrance per section, no loops. */
+  .reveal {
+    opacity: 0;
+    transform: translateY(20px);
+    transition:
+      opacity 0.7s var(--ease-soft),
+      transform 0.7s var(--ease-soft);
+    will-change: opacity, transform;
+  }
+  .reveal.is-visible {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* Respect users who prefer less motion: no entrances, no loops. */
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,
@@ -124,5 +175,9 @@ body {
     animation-duration: 0.001ms !important;
     animation-iteration-count: 1 !important;
     transition-duration: 0.001ms !important;
+  }
+  .reveal {
+    opacity: 1;
+    transform: none;
   }
 }

@@ -1,32 +1,43 @@
 import type { Metadata, Viewport } from "next";
-import { Baloo_2, Nunito } from "next/font/google";
+import { Fraunces, Plus_Jakarta_Sans, DM_Mono } from "next/font/google";
 import "./globals.css";
 
-const display = Baloo_2({
+// Display: a soft serif with editorial warmth and a little personality, the
+// "fun but professional" voice. Body: a clean humanist sans for product-grade
+// legibility. Mono: technical accents (eyebrows, step numbers, prices).
+const display = Fraunces({
   subsets: ["latin"],
-  weight: ["600", "700", "800"],
+  weight: ["400", "500", "600", "700"],
+  style: ["normal", "italic"],
   variable: "--font-display",
   display: "swap",
 });
 
-const body = Nunito({
+const body = Plus_Jakarta_Sans({
   subsets: ["latin"],
-  weight: ["400", "600", "700", "800"],
+  weight: ["400", "500", "600", "700", "800"],
   variable: "--font-body",
   display: "swap",
 });
 
+const mono = DM_Mono({
+  subsets: ["latin"],
+  weight: ["400", "500"],
+  variable: "--font-mono",
+  display: "swap",
+});
+
 export const metadata: Metadata = {
-  title: "I Love My Duck 🦆 — Fatie seu vídeo para os Stories",
+  title: "I Love My Duck: Fatie seu vídeo para os Stories",
   description:
-    "Quebre vídeos longos em partes prontas para os Stories do Instagram, direto no navegador. 100% privado: seu vídeo nunca sai do seu aparelho.",
+    "Transforme um vídeo longo em várias partes prontas para postar em sequência nos Stories do Instagram, direto no navegador. 100% privado: seu vídeo nunca sai do seu aparelho.",
 };
 
 export const viewport: Viewport = {
-  themeColor: "#f7b500",
+  themeColor: "#fffaf2",
   width: "device-width",
   initialScale: 1,
-  // Keep the layout comfortable on mobile while allowing pinch-zoom for a11y.
+  // Comfortable on mobile while still allowing pinch-zoom for a11y.
   maximumScale: 5,
 };
 
@@ -36,8 +47,13 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="pt-BR" className={`${display.variable} ${body.variable}`}>
-      <body className="font-body text-duck-700 antialiased">{children}</body>
+    <html
+      lang="pt-BR"
+      className={`${display.variable} ${body.variable} ${mono.variable}`}
+    >
+      <body className="bg-cream-100 font-body text-ink-soft antialiased">
+        {children}
+      </body>
     </html>
   );
 }

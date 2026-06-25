@@ -1,4 +1,4 @@
-import DuckMascot from "./DuckMascot";
+import Icon from "./Icon";
 
 interface AlertProps {
   title: string;
@@ -18,39 +18,38 @@ export default function Alert({
   action,
   details,
 }: AlertProps) {
-  // Distinct semantic treatments inside the duck palette: a deep bill-orange
-  // bar for true errors (something broke) vs. a softer duck-yellow bar for
-  // cautions (heads-up). The accent bar gives each alert its own identity
-  // without borrowing the solid bill-500 used by the primary CTA.
+  // Two restrained treatments inside the duck palette: a burnt-orange accent
+  // bar for true errors, a softer duck-yellow bar for cautions. The accent bar
+  // gives each alert identity without borrowing the solid CTA orange.
   const isError = tone === "error";
   const toneStyles = isError
-    ? "bg-bill-500/[0.08] ring-bill-500/30"
-    : "bg-duck-100/80 ring-duck-300";
-  const accentBar = isError ? "bg-bill-500" : "bg-duck-400";
-  const titleColor = isError ? "text-bill-600" : "text-duck-700";
+    ? "bg-bill-500/[0.06] border-bill-500/30"
+    : "bg-duck-100/70 border-duck-300";
+  const accentBar = isError ? "bg-bill-600" : "bg-duck-400";
+  const iconColor = isError ? "text-bill-600" : "text-duck-600";
+  const titleColor = isError ? "text-bill-700" : "text-ink";
 
   return (
     <div
       role="alert"
-      className={`relative flex items-start gap-3 overflow-hidden rounded-3xl p-4 pl-5 ring-1 backdrop-blur-sm ${toneStyles}`}
+      className={`relative flex items-start gap-3 overflow-hidden rounded-card border p-4 pl-5 ${toneStyles}`}
     >
-      <span
-        aria-hidden
-        className={`absolute inset-y-0 left-0 w-1.5 ${accentBar}`}
-      />
-      <DuckMascot size={56} mood="sad" className="shrink-0" />
+      <span aria-hidden className={`absolute inset-y-0 left-0 w-1.5 ${accentBar}`} />
+      <span className={`mt-0.5 shrink-0 ${iconColor}`} aria-hidden>
+        <Icon name="shield" size={20} />
+      </span>
       <div className="flex-1">
-        <p className={`font-display text-base font-extrabold leading-snug tracking-tight ${titleColor}`}>
+        <p className={`font-display text-base font-semibold leading-snug ${titleColor}`}>
           {title}
         </p>
-        <p className="mt-1 font-body text-sm leading-relaxed text-duck-700/80">{message}</p>
+        <p className="mt-1 font-body text-sm leading-relaxed text-ink-soft">{message}</p>
 
         {details && (
           <details className="mt-2.5">
-            <summary className="cursor-pointer font-body text-xs font-bold text-duck-700/70 transition-colors hover:text-duck-700">
+            <summary className="cursor-pointer font-body text-xs font-semibold text-ink-muted transition-colors hover:text-ink">
               Ver detalhes técnicos
             </summary>
-            <pre className="mt-1.5 max-h-48 overflow-auto whitespace-pre-wrap break-words rounded-2xl bg-duck-700/5 p-3 font-mono text-[11px] leading-snug text-duck-700/90 ring-1 ring-duck-200/70">
+            <pre className="mt-1.5 max-h-48 overflow-auto whitespace-pre-wrap break-words rounded-field bg-ink/5 p-3 font-mono text-[11px] leading-snug text-ink-soft ring-1 ring-bark-200">
               {details}
             </pre>
           </details>
@@ -62,7 +61,7 @@ export default function Alert({
               <button
                 type="button"
                 onClick={action.onClick}
-                className="btn-primary rounded-full px-4 py-1.5 text-sm shadow"
+                className="btn-primary px-4 py-1.5 text-sm"
               >
                 {action.label}
               </button>
@@ -71,7 +70,7 @@ export default function Alert({
               <button
                 type="button"
                 onClick={onDismiss}
-                className="btn rounded-full px-4 py-1.5 text-sm font-bold text-duck-700 hover:bg-duck-100 active:translate-y-0.5"
+                className="btn-secondary px-4 py-1.5 text-sm"
               >
                 Fechar
               </button>

@@ -2,24 +2,25 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import { formatDuration, segmentsMeta } from "@/lib/format";
+import Icon from "./Icon";
 
 interface CutTimelineProps {
   duration: number;
   cutTimes: number[]; // internal cut points (sorted, exclusive of 0 and end)
   onChange: (next: number[]) => void;
-  /** Whether the fast (copy) path is active — shows the keyframe-snap hint. */
+  /** Whether the fast (copy) path is active, shows the keyframe-snap hint. */
   approximate: boolean;
   disabled?: boolean;
 }
 
-const MIN_GAP = 1; // seconds — keep parts from collapsing onto each other
+const MIN_GAP = 1; // seconds, keep parts from collapsing onto each other
 
 // Alternating block tints so neighbouring parts are easy to tell apart.
 const BLOCK_TINTS = [
-  "bg-duck-200/70",
   "bg-sky-200/70",
+  "bg-duck-200/70",
   "bg-pond-300/60",
-  "bg-bill-400/40",
+  "bg-bill-400/35",
 ];
 
 export default function CutTimeline({
@@ -145,15 +146,15 @@ export default function CutTimeline({
   };
 
   return (
-    <div className="mt-5">
+    <div className="mt-6">
       <div className="flex items-center justify-between gap-3">
         <div>
           <p className="section-title">Pontos de corte</p>
-          <p className="mt-1 font-body text-xs leading-relaxed text-duck-700/70">
-            Arraste as alcinhas 🦆 para cortar sem atropelar a fala.
+          <p className="mt-1 font-body text-sm leading-relaxed text-ink-muted">
+            Arraste as alcinhas para cortar sem atropelar a fala.
           </p>
         </div>
-        <span className="shrink-0 rounded-full bg-pond-300/50 px-2.5 py-1 font-display text-xs font-extrabold text-pond-600 ring-1 ring-pond-400/30">
+        <span className="shrink-0 rounded-full bg-pond-300/30 px-2.5 py-1 font-mono text-xs font-medium text-pond-700 ring-1 ring-pond-400/30">
           {metas.length} {metas.length === 1 ? "parte" : "partes"}
         </span>
       </div>
@@ -162,7 +163,7 @@ export default function CutTimeline({
       <div className="mt-3 select-none">
         <div
           ref={trackRef}
-          className="relative flex h-12 w-full touch-none overflow-hidden rounded-2xl ring-1 ring-duck-200"
+          className="relative flex h-12 w-full touch-none overflow-hidden rounded-xl ring-1 ring-bark-200"
         >
           {metas.map((m, i) => (
             <div
@@ -172,7 +173,7 @@ export default function CutTimeline({
               }`}
               style={{ width: `${(m.duration / duration) * 100}%` }}
             >
-              <span className="font-display text-xs font-extrabold text-duck-700/80">
+              <span className="font-mono text-xs font-medium text-ink/70">
                 {m.index}
               </span>
             </div>
@@ -201,12 +202,12 @@ export default function CutTimeline({
               style={{ left: `${(time / duration) * 100}%` }}
             >
               <span
-                className={`mx-auto block h-full w-1.5 rounded-full transition-colors ${
+                className={`mx-auto block h-full w-1 rounded-full transition-colors ${
                   dragIndex === i ? "bg-bill-600" : "bg-bill-500 group-hover:bg-bill-600"
                 }`}
               />
               <span
-                className={`pointer-events-none absolute -top-1 left-1/2 h-4 w-4 -translate-x-1/2 rounded-full bg-bill-500 shadow ring-2 ring-white transition-transform ${
+                className={`pointer-events-none absolute -top-1 left-1/2 h-4 w-4 -translate-x-1/2 rounded-full bg-bill-600 shadow ring-2 ring-cream-50 transition-transform ${
                   dragIndex === i ? "scale-125" : "group-hover:scale-110"
                 }`}
               />
@@ -220,17 +221,18 @@ export default function CutTimeline({
             {sorted.map((time, i) => (
               <span
                 key={i}
-                className="inline-flex items-center gap-1.5 rounded-full bg-white px-2.5 py-1 font-body text-xs font-semibold text-duck-700 ring-1 ring-duck-200"
+                className="inline-flex items-center gap-1.5 rounded-full bg-cream-50 px-2.5 py-1 font-mono text-xs font-medium text-ink-soft ring-1 ring-bark-200"
               >
-                ✂️ {formatDuration(time)}
+                <Icon name="scissors" size={13} />
+                {formatDuration(time)}
                 <button
                   type="button"
                   onClick={() => removeCut(i)}
                   disabled={disabled}
                   aria-label={`Remover ponto de corte em ${formatDuration(time)}`}
-                  className="text-bill-500 hover:text-bill-600 disabled:opacity-50"
+                  className="ml-0.5 grid h-4 w-4 place-items-center rounded-full text-bill-600 hover:bg-bill-500/10 hover:text-bill-700 disabled:opacity-50"
                 >
-                  ✕
+                  <Icon name="close" size={12} />
                 </button>
               </span>
             ))}
@@ -243,7 +245,7 @@ export default function CutTimeline({
           type="button"
           onClick={addCut}
           disabled={disabled}
-          className="btn-chip rounded-full px-3.5 py-1.5 text-xs"
+          className="btn-secondary px-3.5 py-1.5 text-xs"
         >
           + Adicionar corte
         </button>
@@ -251,16 +253,16 @@ export default function CutTimeline({
           type="button"
           onClick={resetCuts}
           disabled={disabled}
-          className="btn-ghost rounded-full px-3 py-1.5 text-xs underline-offset-2"
+          className="btn-ghost px-3 py-1.5 text-xs"
         >
           Voltar ao padrão
         </button>
       </div>
 
       {approximate && (
-        <p className="mt-3 font-body text-[11px] leading-relaxed text-duck-700/60">
+        <p className="mt-3 font-body text-xs leading-relaxed text-bark-500">
           No modo rápido, cada corte encaixa no quadro-chave mais próximo do ponto
-          escolhido — pode variar uns instantinhos. 🦆
+          escolhido, pode variar uns instantinhos. 🦆
         </p>
       )}
     </div>

@@ -31,7 +31,7 @@ export async function saveSegment(segment: VideoSegment): Promise<SaveResult> {
       await navigator.share({
         files: [file],
         title: segment.fileName,
-        text: `Parte ${segment.index} — I Love My Duck 🦆`,
+        text: `Parte ${segment.index}: I Love My Duck 🦆`,
       });
       return "shared";
     } catch (err) {

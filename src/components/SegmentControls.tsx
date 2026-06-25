@@ -3,6 +3,7 @@
 import type { SegmentDuration } from "@/types";
 import { partsSentence } from "@/lib/format";
 import CutTimeline from "./CutTimeline";
+import Icon from "./Icon";
 
 const DURATIONS: SegmentDuration[] = [15, 30, 60];
 
@@ -24,11 +25,11 @@ export default function SegmentControls({
   disabled,
 }: SegmentControlsProps) {
   return (
-    <div className="duck-card">
+    <div className="card p-5 sm:p-6">
       {/* Segment length */}
       <fieldset disabled={disabled}>
         <legend className="section-title">Tamanho de cada parte</legend>
-        <p className="mt-1 font-body text-xs leading-relaxed text-duck-700/70">
+        <p className="mt-1 font-body text-sm leading-relaxed text-ink-muted">
           O Instagram aceita até 60s por Story 😉
         </p>
 
@@ -47,13 +48,13 @@ export default function SegmentControls({
                 aria-checked={active}
                 onClick={() => onSegmentChange(value)}
                 disabled={disabled}
-                className={`rounded-2xl border-2 px-2 py-3 text-center font-display text-lg font-extrabold transition-[transform,background-color,border-color,box-shadow,color] duration-200 ease-[var(--ease-soft)]
+                className={`rounded-button border px-2 py-3 text-center font-display text-lg font-semibold transition-[background-color,border-color,color,box-shadow] duration-200 ease-[var(--ease-soft)]
                   ${
                     active
-                      ? "-translate-y-0.5 border-bill-500 bg-duck-400 text-bill-700 shadow-pop"
-                      : "border-duck-200 bg-white text-duck-700 hover:-translate-y-0.5 hover:border-duck-400 hover:bg-duck-50 active:translate-y-0"
+                      ? "border-bill-500 bg-bill-500/[0.08] text-bill-700 shadow-button"
+                      : "border-bark-200 bg-cream-50 text-ink-soft hover:border-bark-300 hover:bg-cream-100"
                   }
-                  disabled:cursor-not-allowed disabled:translate-y-0 disabled:opacity-60`}
+                  disabled:cursor-not-allowed disabled:opacity-60`}
               >
                 {value}s
               </button>
@@ -65,12 +66,12 @@ export default function SegmentControls({
       {/* Live part count */}
       <div
         aria-live="polite"
-        className="mt-5 flex items-center gap-2.5 rounded-2xl bg-pond-300/40 px-4 py-3 ring-1 ring-pond-400/30"
+        className="mt-5 flex items-center gap-2.5 rounded-button bg-pond-300/25 px-4 py-3 ring-1 ring-pond-400/30"
       >
-        <span className="text-xl" aria-hidden>
-          🦆
+        <span className="text-pond-700" aria-hidden>
+          <Icon name="stories" size={18} />
         </span>
-        <p className="font-body text-sm font-bold leading-snug text-pond-600">
+        <p className="font-body text-sm font-semibold leading-snug text-pond-700">
           {partsSentence(duration, segment)}
         </p>
       </div>

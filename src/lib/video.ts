@@ -5,7 +5,7 @@ export const ACCEPTED_EXTENSIONS = [".mp4", ".mov", ".webm"];
 
 export function isAcceptedVideo(file: File): boolean {
   if (ACCEPTED_TYPES.includes(file.type)) return true;
-  // Some browsers leave file.type empty for .mov — fall back to extension.
+  // Some browsers leave file.type empty for .mov, fall back to extension.
   const name = file.name.toLowerCase();
   return ACCEPTED_EXTENSIONS.some((ext) => name.endsWith(ext));
 }
