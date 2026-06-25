@@ -100,8 +100,8 @@ export default function Pricing() {
             <div
               className={`relative flex h-full flex-col rounded-card p-6 transition-shadow ${
                 plan.featured
-                  ? "border-2 border-bill-500 bg-cream-50 shadow-accent-lg lg:min-h-[30rem] lg:pt-9 lg:scale-[1.05]"
-                  : "border border-bark-200 bg-cream-50/80 shadow-card lg:min-h-[27rem]"
+                  ? "border-2 border-bill-500 bg-cream-50 shadow-accent-lg lg:h-[31rem] lg:pt-9 lg:scale-[1.05]"
+                  : "border border-bark-200 bg-cream-50/80 shadow-card lg:h-[27rem]"
               }`}
             >
               {plan.badge && (
@@ -151,11 +151,6 @@ export default function Pricing() {
           </Reveal>
         ))}
       </div>
-
-      <p className="mt-6 text-center font-body text-xs text-bark-500">
-        Valores ilustrativos. O pagamento ainda não está ativo, por enquanto é só
-        uma palhinha. 🦆
-      </p>
     </section>
   );
 }

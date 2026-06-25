@@ -10,6 +10,8 @@ interface AuthShellProps {
   children: ReactNode;
   /** Links shown under the form (e.g. "já tem conta?"). */
   footer: ReactNode;
+  /** Interactive mascot perched above the title (see <AuthDuck>). */
+  duck?: ReactNode;
 }
 
 /**
@@ -17,7 +19,13 @@ interface AuthShellProps {
  * (desktop) and the form card on the right. Purely presentational, pages own
  * their state and submit handlers, so real auth plugs straight in.
  */
-export default function AuthShell({ title, subtitle, children, footer }: AuthShellProps) {
+export default function AuthShell({
+  title,
+  subtitle,
+  children,
+  footer,
+  duck,
+}: AuthShellProps) {
   return (
     <div className="grid min-h-screen lg:grid-cols-[1.05fr_1fr]">
       {/* Brand panel */}
@@ -50,6 +58,11 @@ export default function AuthShell({ title, subtitle, children, footer }: AuthShe
 
         <div className="flex flex-1 items-center justify-center py-10">
           <div className="w-full max-w-sm">
+            {duck && (
+              <div className="mb-2 flex justify-center">
+                <div className="w-28 sm:w-32">{duck}</div>
+              </div>
+            )}
             <h1 className="font-display text-3xl font-semibold tracking-tight text-ink">
               {title}
             </h1>

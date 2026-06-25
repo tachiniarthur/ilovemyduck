@@ -1,5 +1,5 @@
 import Link from "next/link";
-import DuckLogo from "./brand/DuckLogo";
+import Image from "next/image";
 import Icon from "./Icon";
 
 const COLUMNS = [
@@ -27,7 +27,19 @@ export default function SiteFooter() {
     <footer className="mt-24 border-t border-bark-200/70 bg-cream-50/60">
       <div className="container-page grid gap-10 py-14 sm:grid-cols-2 lg:grid-cols-[1.4fr_1fr_1fr]">
         <div className="max-w-xs">
-          <DuckLogo />
+          <Link
+            href="/"
+            aria-label="I Love My Duck, página inicial"
+            className="inline-flex rounded-xl"
+          >
+            <Image
+              src="/logo-2.png"
+              alt="I Love My Duck"
+              width={648}
+              height={228}
+              className="h-12 w-auto object-contain"
+            />
+          </Link>
           <p className="mt-4 text-pretty font-body text-sm leading-relaxed text-ink-muted">
             Fatie vídeos longos em partes prontas para os Stories, direto no
             navegador. Seu vídeo nunca sai do seu aparelho. Feito com 💛 e muitos

@@ -41,7 +41,7 @@ export default function PhoneMockup({ src, alt = "", className = "" }: PhoneMock
               aria-hidden
               className="absolute inset-2 rounded-[1.2rem] border border-dashed border-bark-300"
             />
-            <DuckGlyph size={34} />
+            <DuckGlyph size={56} />
             <p className="px-4 font-mono text-[11px] uppercase tracking-wider text-bark-500">
               Captura em breve
             </p>

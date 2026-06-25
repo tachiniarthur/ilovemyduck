@@ -167,6 +167,174 @@ body {
   }
 }
 
+/* ---- AuthDuck: the interactive mascot on the auth screens ------------- */
+/* Every animated part lives on its own group so transforms never collide:
+   the root scales (anticipation/jump), an inner group breathes, the head
+   tilts (focus) and shakes/wobbles (error/typing) on nested groups, and each
+   wing/eye carries its own transform. Eye-follow is driven from JS. */
+.auth-duck {
+  width: 100%;
+  transform-box: border-box;
+  transform-origin: 50% 100%;
+  transition: transform 0.3s var(--ease-soft);
+}
+.auth-duck svg {
+  display: block;
+  width: 100%;
+  height: auto;
+  overflow: visible;
+}
+.auth-duck.is-anticipate {
+  transform: scale(1.06) translateY(-2px);
+}
+.auth-duck.is-jump {
+  animation: duck-jump 0.7s var(--ease-soft);
+}
+
+.duck-bob {
+  transform-box: fill-box;
+  transform-origin: 50% 100%;
+  animation: duck-breathe 4.5s ease-in-out infinite;
+}
+
+.duck-head-tilt {
+  transform-box: fill-box;
+  transform-origin: 50% 92%;
+  transition: transform 0.45s var(--ease-soft);
+}
+
+.duck-head-anim {
+  transform-box: fill-box;
+  transform-origin: 50% 96%;
+}
+.duck-head-anim.is-shake {
+  animation: duck-shake 0.55s ease-in-out;
+}
+.duck-head-anim.is-wobble {
+  animation: duck-wobble 1.1s ease-in-out infinite;
+}
+
+.duck-eye {
+  transform-box: fill-box;
+  transform-origin: 50% 50%;
+  transition: transform 0.12s ease;
+}
+.duck-eye.is-blinking {
+  transform: scaleY(0.08);
+}
+.duck-eye.is-happy {
+  transform: scaleY(0.5) translateY(3px);
+}
+
+.duck-wing {
+  transform-box: fill-box;
+  transform-origin: 50% 50%;
+  transition: transform 0.45s cubic-bezier(0.34, 1.4, 0.5, 1);
+}
+.duck-wing.is-cover-left {
+  transform: translate(44px, -70px) rotate(14deg);
+}
+.duck-wing.is-cover-right {
+  transform: translate(-44px, -70px) rotate(-14deg);
+}
+.duck-wing.is-flap-left {
+  animation: duck-flap-left 0.5s ease-in-out infinite;
+}
+.duck-wing.is-flap-right {
+  animation: duck-flap-right 0.5s ease-in-out infinite;
+}
+.duck-wing.is-scratch {
+  animation: duck-scratch 1.8s ease-in-out infinite;
+}
+
+.duck-cheeks {
+  opacity: 0.3;
+  transition: opacity 0.4s ease;
+}
+.duck-cheeks.is-blush {
+  opacity: 0.8;
+}
+
+.duck-brows,
+.duck-dots,
+.duck-sparkles {
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  pointer-events: none;
+}
+.duck-brows.is-on,
+.duck-dots.is-on,
+.duck-sparkles.is-on {
+  opacity: 1;
+}
+.spark,
+.dot {
+  transform-box: fill-box;
+  transform-origin: 50% 50%;
+}
+.duck-sparkles.is-on .spark {
+  animation: duck-sparkle 1s ease-in-out infinite;
+}
+.duck-sparkles.is-on .spark:nth-child(2) {
+  animation-delay: 0.22s;
+}
+.duck-sparkles.is-on .spark:nth-child(3) {
+  animation-delay: 0.45s;
+}
+.duck-dots.is-on .dot {
+  animation: duck-dot 1.4s ease-in-out infinite;
+}
+.duck-dots.is-on .dot:nth-child(2) {
+  animation-delay: 0.2s;
+}
+.duck-dots.is-on .dot:nth-child(3) {
+  animation-delay: 0.4s;
+}
+
+@keyframes duck-breathe {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-3px); }
+}
+@keyframes duck-jump {
+  0% { transform: translateY(0) scale(1); }
+  18% { transform: translateY(0) scale(1.06, 0.94); }
+  45% { transform: translateY(-16px) scale(0.97, 1.05); }
+  70% { transform: translateY(0) scale(1.05, 0.95); }
+  100% { transform: translateY(0) scale(1); }
+}
+@keyframes duck-shake {
+  0%, 100% { transform: rotate(0); }
+  20% { transform: rotate(-9deg); }
+  40% { transform: rotate(7deg); }
+  60% { transform: rotate(-5deg); }
+  80% { transform: rotate(3deg); }
+}
+@keyframes duck-wobble {
+  0%, 100% { transform: rotate(-3deg); }
+  50% { transform: rotate(3deg); }
+}
+@keyframes duck-flap-left {
+  0%, 100% { transform: rotate(0); }
+  50% { transform: rotate(24deg); }
+}
+@keyframes duck-flap-right {
+  0%, 100% { transform: rotate(0); }
+  50% { transform: rotate(-24deg); }
+}
+@keyframes duck-scratch {
+  0%, 100% { transform: translate(-24px, -78px) rotate(-18deg); }
+  50% { transform: translate(-24px, -86px) rotate(-6deg); }
+}
+@keyframes duck-sparkle {
+  0% { opacity: 0; transform: scale(0); }
+  40% { opacity: 1; transform: scale(1); }
+  100% { opacity: 0; transform: scale(0.4); }
+}
+@keyframes duck-dot {
+  0%, 100% { opacity: 0.35; transform: translateY(0); }
+  50% { opacity: 1; transform: translateY(-2px); }
+}
+
 /* Respect users who prefer less motion: no entrances, no loops. */
 @media (prefers-reduced-motion: reduce) {
   *,

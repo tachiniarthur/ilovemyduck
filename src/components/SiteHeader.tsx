@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import DuckLogo from "./brand/DuckLogo";
+import Image from "next/image";
 import Icon from "./Icon";
 
 // Section anchors are absolute (prefixed with "/") so they resolve from the
@@ -19,8 +19,21 @@ export default function SiteHeader() {
 
   return (
     <header className="sticky top-0 z-50 border-b border-bark-200/70 bg-cream-100/80 backdrop-blur-md">
-      <div className="container-page flex h-16 items-center justify-between gap-4">
-        <DuckLogo />
+      <div className="container-page flex h-20 items-center justify-between gap-4">
+        <Link
+          href="/"
+          aria-label="I Love My Duck, página inicial"
+          className="inline-flex shrink-0 rounded-xl"
+        >
+          <Image
+            src="/logo-2.png"
+            alt="I Love My Duck"
+            width={648}
+            height={228}
+            priority
+            className="h-14 w-auto object-contain"
+          />
+        </Link>
 
         {/* Desktop nav */}
         <nav className="hidden items-center gap-7 md:flex" aria-label="Principal">

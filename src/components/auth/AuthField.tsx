@@ -9,6 +9,9 @@ interface AuthFieldProps {
   value: string;
   onChange: (value: string) => void;
   onBlur?: () => void;
+  onFocus?: () => void;
+  /** Notified when the show/hide password toggle flips (passwords only). */
+  onRevealChange?: (revealed: boolean) => void;
   icon?: IconName;
   placeholder?: string;
   autoComplete?: string;
@@ -28,6 +31,8 @@ export default function AuthField({
   value,
   onChange,
   onBlur,
+  onFocus,
+  onRevealChange,
   icon,
   placeholder,
   autoComplete,
@@ -56,6 +61,7 @@ export default function AuthField({
           value={value}
           onChange={(e) => onChange(e.target.value)}
           onBlur={onBlur}
+          onFocus={onFocus}
           placeholder={placeholder}
           autoComplete={autoComplete}
           aria-invalid={error ? true : undefined}
@@ -67,7 +73,13 @@ export default function AuthField({
         {isPassword && (
           <button
             type="button"
-            onClick={() => setReveal((v) => !v)}
+            onClick={() =>
+              setReveal((v) => {
+                const next = !v;
+                onRevealChange?.(next);
+                return next;
+              })
+            }
             aria-label={reveal ? "Ocultar senha" : "Mostrar senha"}
             className="absolute right-2 top-1/2 grid h-8 w-8 -translate-y-1/2 place-items-center rounded-lg text-bark-500 transition-colors hover:bg-cream-200 hover:text-ink"
           >

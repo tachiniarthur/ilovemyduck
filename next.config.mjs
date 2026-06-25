@@ -2,7 +2,7 @@
 
 // FFmpeg.wasm relies on SharedArrayBuffer, which the browser only enables when
 // the page is "cross-origin isolated". That requires these two headers on EVERY
-// route — without them ffmpeg.load() fails silently and the app appears broken.
+// route; without them ffmpeg.load() fails silently and the app appears broken.
 // This is the single most common cause of failure for in-browser FFmpeg apps.
 const crossOriginIsolationHeaders = [
   {

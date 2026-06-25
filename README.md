@@ -1,7 +1,7 @@
 # I Love My Duck 🦆
 
 Fatie um vídeo longo em várias partes prontas para postar em sequência nos
-**Stories do Instagram** — direto no navegador, sem editor complicado.
+**Stories do Instagram**, direto no navegador, sem editor complicado.
 
 > 🔒 **100% privado:** o vídeo é processado inteiramente no seu aparelho com
 > [FFmpeg.wasm](https://ffmpegwasm.netlify.app/). Nada é enviado para servidor
@@ -15,7 +15,7 @@ Fatie um vídeo longo em várias partes prontas para postar em sequência nos
   contagem em tempo real de quantas partes serão geradas.
 - Corte **rápido por cópia de stream** (`-c copy` + *segment muxer*): nada é
   reencodado, então até vídeos longos fatiam em segundos. A divisão cai no
-  keyframe mais próximo, então cada parte já começa num quadro válido — sem
+  keyframe mais próximo, então cada parte já começa num quadro válido, sem
   início preto/travado.
 - **Linha do tempo de cortes:** arraste, adicione ou remova os pontos de corte
   para não cortar no meio de uma fala.
@@ -48,7 +48,7 @@ Cross-Origin-Embedder-Policy: require-corp
 ```
 
 As fontes são auto-hospedadas (`next/font`) e o core **single-thread**
-(`@ffmpeg/core`) do FFmpeg é carregado via `toBlobURL` (core + wasm — o core ST
+(`@ffmpeg/core`) do FFmpeg é carregado via `toBlobURL` (core + wasm; o core ST
 não tem `worker.js`), o que o mantém compatível com o `require-corp`. A
 instância é carregada uma única vez (com timeout + `AbortSignal`, para nunca
 ficar travada caso o worker morra durante a inicialização) e reutilizada entre
@@ -97,7 +97,7 @@ src/
   o usuário escolhe *"Salvar vídeo"* (iOS) / *"Salvar na galeria"* (Android).
 - No celular priorizamos salvar parte por parte (iOS não lida bem com ZIP indo
   para a galeria). O ZIP é a conveniência principal do desktop.
-- Vídeos muito grandes podem estourar a memória do Safari iOS — o app avisa de
+- Vídeos muito grandes podem estourar a memória do Safari iOS, o app avisa de
   forma amigável e sugere um vídeo menor ou cortes maiores, sem quebrar.
 
 Feito com 💛 e muitos quacks.

@@ -42,8 +42,8 @@ export default function ResultsView({ segments, onStartOver }: ResultsViewProps)
     <div className="space-y-5">
       {/* Done banner, left-aligned, glyph as a small accent (no big mascot) */}
       <div className="card flex items-center gap-4 p-5 sm:p-6">
-        <span className="grid h-12 w-12 shrink-0 place-items-center rounded-2xl bg-pond-300/30 ring-1 ring-pond-400/30">
-          <DuckGlyph size={28} />
+        <span className="grid h-16 w-16 shrink-0 place-items-center rounded-2xl bg-pond-300/30 ring-1 ring-pond-400/30">
+          <DuckGlyph size={48} />
         </span>
         <div>
           <h2 className="text-balance font-display text-2xl font-semibold leading-tight text-ink">

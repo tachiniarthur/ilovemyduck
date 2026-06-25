@@ -14,7 +14,7 @@ export default function FinalCta() {
             className="slice-line absolute inset-x-8 top-0 hidden sm:block"
           />
           <div className="relative max-w-xl">
-            <DuckGlyph size={40} />
+            <DuckGlyph size={72} />
             <h2 className="mt-5 text-balance font-display text-display-lg font-semibold text-ink">
               Pronto pra deixar o patinho{" "}
               <span className="italic text-bill-600">fatiar</span>?

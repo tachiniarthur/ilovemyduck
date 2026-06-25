@@ -8,7 +8,7 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        // The duck palette 🦆 — kept intact, used with intention.
+        // The duck palette 🦆: kept intact, used with intention.
         duck: {
           50: "#fffbeb",
           100: "#fff3c4",
@@ -20,7 +20,7 @@ const config: Config = {
           700: "#a86d00",
         },
         bill: {
-          // Burnt / bill orange — the accent + title colour. Used sparingly.
+          // Burnt / bill orange: the accent + title colour. Used sparingly.
           400: "#ff9d4d",
           500: "#ff7a18",
           600: "#ed5e00", // primary accent for titles & CTAs
@@ -86,7 +86,7 @@ const config: Config = {
         ],
       },
       borderRadius: {
-        // Contained, grown-up corners — no blobby 5xl.
+        // Contained, grown-up corners: no blobby 5xl.
         button: "0.75rem",
         card: "1.15rem",
         field: "0.7rem",

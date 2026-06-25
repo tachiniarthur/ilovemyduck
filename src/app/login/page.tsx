@@ -5,6 +5,8 @@ import Link from "next/link";
 import AuthShell from "@/components/auth/AuthShell";
 import AuthField from "@/components/auth/AuthField";
 import AuthNotice from "@/components/auth/AuthNotice";
+import AuthDuck from "@/components/auth/AuthDuck";
+import { useAuthDuck } from "@/components/auth/useAuthDuck";
 import { isEmail } from "@/lib/validation";
 
 export default function LoginPage() {
@@ -12,6 +14,7 @@ export default function LoginPage() {
   const [password, setPassword] = useState("");
   const [errors, setErrors] = useState<{ email?: string; password?: string }>({});
   const [submitted, setSubmitted] = useState(false);
+  const duck = useAuthDuck();
 
   const validate = () => {
     const next: typeof errors = {};
@@ -25,13 +28,19 @@ export default function LoginPage() {
     e.preventDefault();
     setSubmitted(false);
     // TODO: plug real authentication here (e.g. signIn({ email, password })).
-    if (validate()) setSubmitted(true);
+    if (validate()) {
+      setSubmitted(true);
+      duck.succeed();
+    } else {
+      duck.fail();
+    }
   };
 
   return (
     <AuthShell
       title="Bem-vindo de volta 🦆"
       subtitle="Entre para continuar fatiando seus vídeos."
+      duck={<AuthDuck {...duck.duckProps} />}
       footer={
         <>
           Ainda não tem conta?{" "}
@@ -56,13 +65,16 @@ export default function LoginPage() {
           onChange={(v) => {
             setEmail(v);
             if (errors.email) setErrors((p) => ({ ...p, email: undefined }));
+            duck.notifyTyping();
           }}
-          onBlur={() =>
+          onFocus={() => duck.onFieldFocus("email")}
+          onBlur={() => {
+            duck.onFieldBlur();
             setErrors((p) => ({
               ...p,
               email: email && !isEmail(email) ? "Digite um e-mail válido." : undefined,
-            }))
-          }
+            }));
+          }}
           error={errors.email}
         />
 
@@ -77,7 +89,11 @@ export default function LoginPage() {
             onChange={(v) => {
               setPassword(v);
               if (errors.password) setErrors((p) => ({ ...p, password: undefined }));
+              duck.reset();
             }}
+            onFocus={() => duck.onFieldFocus("password")}
+            onBlur={() => duck.onFieldBlur()}
+            onRevealChange={duck.onRevealChange}
             error={errors.password}
           />
           <div className="mt-2 text-right">
@@ -90,7 +106,11 @@ export default function LoginPage() {
           </div>
         </div>
 
-        <button type="submit" className="btn-primary w-full px-4 py-3 text-base">
+        <button
+          type="submit"
+          className="btn-primary w-full px-4 py-3 text-base"
+          {...duck.submitHoverHandlers}
+        >
           Entrar
         </button>
       </form>

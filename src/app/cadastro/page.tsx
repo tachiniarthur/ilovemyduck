@@ -5,6 +5,8 @@ import Link from "next/link";
 import AuthShell from "@/components/auth/AuthShell";
 import AuthField from "@/components/auth/AuthField";
 import AuthNotice from "@/components/auth/AuthNotice";
+import AuthDuck from "@/components/auth/AuthDuck";
+import { useAuthDuck } from "@/components/auth/useAuthDuck";
 import { isEmail, isStrongEnough } from "@/lib/validation";
 
 export default function CadastroPage() {
@@ -17,6 +19,7 @@ export default function CadastroPage() {
     password?: string;
   }>({});
   const [submitted, setSubmitted] = useState(false);
+  const duck = useAuthDuck();
 
   const validate = () => {
     const next: typeof errors = {};
@@ -31,16 +34,24 @@ export default function CadastroPage() {
     e.preventDefault();
     setSubmitted(false);
     // TODO: plug real account creation here (e.g. signUp({ name, email, password })).
-    if (validate()) setSubmitted(true);
+    if (validate()) {
+      setSubmitted(true);
+      duck.succeed();
+    } else {
+      duck.fail();
+    }
   };
 
-  const clear = (key: keyof typeof errors) =>
-    errors[key] && setErrors((p) => ({ ...p, [key]: undefined }));
+  const clear = (key: keyof typeof errors) => {
+    duck.reset();
+    return errors[key] && setErrors((p) => ({ ...p, [key]: undefined }));
+  };
 
   return (
     <AuthShell
       title="Crie sua conta"
       subtitle="É rapidinho, depois é só soltar o vídeo e fatiar."
+      duck={<AuthDuck {...duck.duckProps} />}
       footer={
         <>
           Já tem conta?{" "}
@@ -64,13 +75,16 @@ export default function CadastroPage() {
           onChange={(v) => {
             setName(v);
             clear("name");
+            duck.notifyTyping();
           }}
-          onBlur={() =>
+          onFocus={() => duck.onFieldFocus("name")}
+          onBlur={() => {
+            duck.onFieldBlur();
             setErrors((p) => ({
               ...p,
               name: name && name.trim().length < 2 ? "Como podemos te chamar?" : undefined,
-            }))
-          }
+            }));
+          }}
           error={errors.name}
         />
 
@@ -84,13 +98,16 @@ export default function CadastroPage() {
           onChange={(v) => {
             setEmail(v);
             clear("email");
+            duck.notifyTyping();
           }}
-          onBlur={() =>
+          onFocus={() => duck.onFieldFocus("email")}
+          onBlur={() => {
+            duck.onFieldBlur();
             setErrors((p) => ({
               ...p,
               email: email && !isEmail(email) ? "Digite um e-mail válido." : undefined,
-            }))
-          }
+            }));
+          }}
           error={errors.email}
         />
 
@@ -105,19 +122,26 @@ export default function CadastroPage() {
             setPassword(v);
             clear("password");
           }}
-          onBlur={() =>
+          onFocus={() => duck.onFieldFocus("password")}
+          onRevealChange={duck.onRevealChange}
+          onBlur={() => {
+            duck.onFieldBlur();
             setErrors((p) => ({
               ...p,
               password:
                 password && !isStrongEnough(password)
                   ? "Use ao menos 6 caracteres."
                   : undefined,
-            }))
-          }
+            }));
+          }}
           error={errors.password}
         />
 
-        <button type="submit" className="btn-primary w-full px-4 py-3 text-base">
+        <button
+          type="submit"
+          className="btn-primary w-full px-4 py-3 text-base"
+          {...duck.submitHoverHandlers}
+        >
           Criar conta
         </button>
 

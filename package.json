@@ -2,7 +2,7 @@
   "name": "i-love-my-duck",
   "version": "1.0.0",
   "private": true,
-  "description": "Fatie seu vídeo em partes prontas para os Stories do Instagram — direto no navegador, 100% privado. Quack!",
+  "description": "Fatie seu vídeo em partes prontas para os Stories do Instagram, direto no navegador, 100% privado. Quack!",
   "scripts": {
     "dev": "next dev",
     "build": "next build",

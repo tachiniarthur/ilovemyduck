@@ -49,12 +49,6 @@ export default function StoryStrip() {
             <span className="absolute left-1.5 top-1.5 rounded-md bg-ink/80 px-1.5 py-0.5 font-mono text-[10px] font-medium text-cream-50">
               {String(i + 1).padStart(2, "0")}
             </span>
-            {i === 0 && (
-              <DuckGlyph
-                size={22}
-                className="absolute bottom-2 left-1/2 -translate-x-1/2 opacity-90"
-              />
-            )}
           </div>
         ))}
       </div>

@@ -16,11 +16,11 @@ interface DuckLogoProps {
 export default function DuckLogo({
   asLink = true,
   className = "",
-  glyphSize = 30,
+  glyphSize = 44,
 }: DuckLogoProps) {
   const inner = (
     <span className="inline-flex items-center gap-2.5">
-      <span className="grid h-9 w-9 place-items-center rounded-xl bg-duck-100 ring-1 ring-bark-200">
+      <span className="grid h-12 w-12 place-items-center rounded-xl bg-duck-100 ring-1 ring-bark-200">
         <DuckGlyph size={glyphSize} title="I Love My Duck" />
       </span>
       <span className="font-display text-[1.15rem] font-semibold leading-none tracking-tight text-ink">
