@@ -175,25 +175,108 @@ export default function AuthDuck({
   return (
     <div className={`auth-duck ${rootCls} ${className}`} aria-hidden="true">
       <svg ref={svgRef} viewBox="0 0 220 216" role="presentation">
+        {/* Soft, hand-illustrated shading: warm volume gradients, a beak with
+            two mandibles, layered feathers and catch-lit eyes. The structural
+            groups, refs and class names are untouched so every animation in the
+            stylesheet keeps driving the same parts. */}
+        <defs>
+          <radialGradient id="duckBody" cx="38%" cy="24%" r="86%">
+            <stop offset="0%" stopColor="#ffe79a" />
+            <stop offset="48%" stopColor="#ffc62a" />
+            <stop offset="100%" stopColor="#e59c05" />
+          </radialGradient>
+          <radialGradient id="duckHead" cx="36%" cy="26%" r="84%">
+            <stop offset="0%" stopColor="#ffe9a6" />
+            <stop offset="50%" stopColor="#ffcf3f" />
+            <stop offset="100%" stopColor="#eaa206" />
+          </radialGradient>
+          <linearGradient id="duckBelly" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stopColor="#fff4c8" />
+            <stop offset="100%" stopColor="#ffe287" />
+          </linearGradient>
+          <linearGradient id="duckBeak" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stopColor="#ffb152" />
+            <stop offset="55%" stopColor="#fb841a" />
+            <stop offset="100%" stopColor="#e35e00" />
+          </linearGradient>
+          <linearGradient id="duckBeakLow" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stopColor="#f3790d" />
+            <stop offset="100%" stopColor="#cf5300" />
+          </linearGradient>
+          <linearGradient id="duckWing" x1="0.15" y1="0" x2="0.5" y2="1">
+            <stop offset="0%" stopColor="#ffd85d" />
+            <stop offset="100%" stopColor="#eaa00a" />
+          </linearGradient>
+          <radialGradient id="duckCheek" cx="50%" cy="45%" r="55%">
+            <stop offset="0%" stopColor="#ffa367" />
+            <stop offset="100%" stopColor="#ff7c3c" />
+          </radialGradient>
+        </defs>
+
         <g className="duck-bob">
+          {/* Contact shadow on the ground */}
+          <ellipse cx="110" cy="208" rx="60" ry="8" fill="#bf8400" opacity="0.15" />
+
+          {/* Tail feathers peeking out behind the body */}
+          <path
+            d="M176 148 q26 -8 35 3 q-10 9 -25 13 q-12 2 -10 -16 z"
+            fill="url(#duckWing)"
+            stroke="#e09a00"
+            strokeWidth="1.2"
+            strokeLinejoin="round"
+          />
+
           {/* Body */}
-          <ellipse cx="110" cy="170" rx="80" ry="46" fill="#ffce3f" />
-          <ellipse cx="110" cy="178" rx="54" ry="36" fill="#ffe588" />
+          <ellipse cx="110" cy="170" rx="80" ry="46" fill="url(#duckBody)" />
+          {/* Lighter chest / belly */}
+          <path
+            d="M70 156 q40 48 80 0 q-5 42 -40 42 q-35 0 -40 -42 z"
+            fill="url(#duckBelly)"
+            opacity="0.9"
+          />
+          {/* Rim light across the top of the body */}
+          <path
+            d="M42 154 q68 -50 136 0"
+            stroke="#fff2c4"
+            strokeWidth="3.5"
+            fill="none"
+            strokeLinecap="round"
+            opacity="0.5"
+          />
 
           {/* Head + face (tilt on focus, shake/wobble on error/typing) */}
           <g className="duck-head-tilt" style={headTiltStyle}>
             <g className={`duck-head-anim ${headAnimCls}`}>
-              {/* little tuft */}
+              {/* topknot quiff */}
               <path
-                d="M101 28 c-3 -15 12 -19 13 -6 c9 -7 17 5 7 12 z"
-                fill="#ffce3f"
+                d="M112 26 c-3 -14 -15 -15 -16 -4 c6 -3 11 0 12 6 c1 -12 13 -14 14 -4 c1 5 -3 9 -9 11 z"
+                fill="url(#duckHead)"
+                stroke="#e7a705"
+                strokeWidth="1.2"
+                strokeLinejoin="round"
               />
-              <circle cx="110" cy="80" r="56" fill="#ffd54a" />
+
+              {/* head */}
+              <path
+                d="M110 22 C142 22 167 45 167 78 C167 110 144 134 110 134 C76 134 53 110 53 78 C53 45 78 22 110 22 Z"
+                fill="url(#duckHead)"
+              />
+              {/* forehead highlight + soft jaw shadow for volume */}
+              <ellipse cx="92" cy="50" rx="30" ry="19" fill="#fff1c2" opacity="0.45" />
+              <path
+                d="M66 104 q44 30 88 0 q-16 28 -44 28 q-28 0 -44 -28 z"
+                fill="#e6a200"
+                opacity="0.16"
+              />
+
+              {/* soft sockets to set the eyes into the face */}
+              <ellipse cx="88" cy="75" rx="17" ry="18.5" fill="#eaad12" opacity="0.32" />
+              <ellipse cx="132" cy="75" rx="17" ry="18.5" fill="#eaad12" opacity="0.32" />
 
               {/* cheeks (blush when covering the eyes) */}
               <g className={cheekCls}>
-                <ellipse cx="72" cy="96" rx="11" ry="7.5" fill="#ff8a3d" />
-                <ellipse cx="148" cy="96" rx="11" ry="7.5" fill="#ff8a3d" />
+                <ellipse cx="69" cy="99" rx="12" ry="8" fill="url(#duckCheek)" />
+                <ellipse cx="151" cy="99" rx="12" ry="8" fill="url(#duckCheek)" />
               </g>
 
               {/* eyes */}
@@ -201,101 +284,125 @@ export default function AuthDuck({
                 <ellipse
                   cx="88"
                   cy="74"
-                  rx="15"
-                  ry="16"
+                  rx="15.5"
+                  ry="17"
                   fill="#ffffff"
-                  stroke="#e3d4b8"
-                  strokeWidth="1.5"
+                  stroke="#e7cfa0"
+                  strokeWidth="1.2"
                 />
+                <ellipse cx="88" cy="65" rx="13" ry="5" fill="#e9d4ab" opacity="0.4" />
                 <g ref={leftIris} className="duck-iris">
-                  <circle cx="88" cy="76" r="7" fill="#241a12" />
-                  <circle cx="85.4" cy="73" r="2.4" fill="#ffffff" />
+                  <circle cx="88" cy="76" r="7.6" fill="#2b1d10" />
+                  <circle cx="85" cy="72.5" r="2.8" fill="#ffffff" />
+                  <circle cx="91" cy="79" r="1.3" fill="#ffffff" opacity="0.8" />
                 </g>
               </g>
               <g className={eyeCls}>
                 <ellipse
                   cx="132"
                   cy="74"
-                  rx="15"
-                  ry="16"
+                  rx="15.5"
+                  ry="17"
                   fill="#ffffff"
-                  stroke="#e3d4b8"
-                  strokeWidth="1.5"
+                  stroke="#e7cfa0"
+                  strokeWidth="1.2"
                 />
+                <ellipse cx="132" cy="65" rx="13" ry="5" fill="#e9d4ab" opacity="0.4" />
                 <g ref={rightIris} className="duck-iris">
-                  <circle cx="132" cy="76" r="7" fill="#241a12" />
-                  <circle cx="129.4" cy="73" r="2.4" fill="#ffffff" />
+                  <circle cx="132" cy="76" r="7.6" fill="#2b1d10" />
+                  <circle cx="129" cy="72.5" r="2.8" fill="#ffffff" />
+                  <circle cx="135" cy="79" r="1.3" fill="#ffffff" opacity="0.8" />
                 </g>
               </g>
 
               {/* worried brows (only on error) */}
               <g className={`duck-brows ${error ? "is-on" : ""}`}>
                 <path
-                  d="M76 58 L98 53"
+                  d="M74 56 q12 -7 24 -3"
                   stroke="#b06a00"
-                  strokeWidth="3.5"
+                  strokeWidth="4"
                   strokeLinecap="round"
+                  fill="none"
                 />
                 <path
-                  d="M144 58 L122 53"
+                  d="M146 56 q-12 -7 -24 -3"
                   stroke="#b06a00"
-                  strokeWidth="3.5"
+                  strokeWidth="4"
                   strokeLinecap="round"
+                  fill="none"
                 />
               </g>
 
-              {/* beak */}
+              {/* beak: lower mandible behind, upper mandible on top */}
               <path
-                d="M84 98 q26 -10 52 0 q2 12 -10 17 q-16 7 -32 0 q-12 -5 -10 -17 z"
-                fill="#ff7a18"
+                d="M89 108 q21 9 42 0 q-3 13 -21 13 q-18 0 -21 -13 z"
+                fill="url(#duckBeakLow)"
               />
               <path
-                d="M88 106 q22 9 44 0"
-                stroke="#d95400"
+                d="M82 95 q28 -12 56 0 q1 11 -9 16 q-19 8 -38 0 q-10 -5 -9 -16 z"
+                fill="url(#duckBeak)"
+                stroke="#cf560a"
+                strokeWidth="0.8"
+                strokeLinejoin="round"
+              />
+              <path
+                d="M93 96 q17 -6 34 0"
+                stroke="#ffd7a3"
                 strokeWidth="2.5"
                 fill="none"
                 strokeLinecap="round"
+                opacity="0.7"
               />
-              <circle cx="101" cy="101" r="1.6" fill="#d95400" />
-              <circle cx="119" cy="101" r="1.6" fill="#d95400" />
+              <ellipse cx="101" cy="100" rx="1.7" ry="1.2" fill="#b8480a" />
+              <ellipse cx="119" cy="100" rx="1.7" ry="1.2" fill="#b8480a" />
             </g>
           </g>
 
           {/* Wings: drawn on top so they can rise to cover the face */}
           <g className={`duck-wing ${leftWingCls}`}>
-            <ellipse
-              cx="46"
-              cy="150"
-              rx="22"
-              ry="34"
-              fill="#ffc41f"
-              stroke="#e9a900"
-              strokeWidth="1.5"
-              transform="rotate(12 46 150)"
+            <path
+              d="M40 124 q-14 22 -6 44 q5 13 18 14 q12 -30 6 -58 q-9 -6 -18 0 z"
+              fill="url(#duckWing)"
+              stroke="#e09a00"
+              strokeWidth="1.4"
+              strokeLinejoin="round"
             />
             <path
-              d="M40 134 q5 28 3 46"
-              stroke="#e9a900"
-              strokeWidth="2"
+              d="M40 138 q4 22 8 36"
+              stroke="#dd9500"
+              strokeWidth="1.6"
               fill="none"
+              opacity="0.55"
+            />
+            <path
+              d="M49 134 q4 22 7 34"
+              stroke="#dd9500"
+              strokeWidth="1.3"
+              fill="none"
+              opacity="0.4"
             />
           </g>
           <g className={`duck-wing ${rightWingCls}`}>
-            <ellipse
-              cx="174"
-              cy="150"
-              rx="22"
-              ry="34"
-              fill="#ffc41f"
-              stroke="#e9a900"
-              strokeWidth="1.5"
-              transform="rotate(-12 174 150)"
+            <path
+              d="M180 124 q14 22 6 44 q-5 13 -18 14 q-12 -30 -6 -58 q9 -6 18 0 z"
+              fill="url(#duckWing)"
+              stroke="#e09a00"
+              strokeWidth="1.4"
+              strokeLinejoin="round"
             />
             <path
-              d="M180 134 q-5 28 -3 46"
-              stroke="#e9a900"
-              strokeWidth="2"
+              d="M180 138 q-4 22 -8 36"
+              stroke="#dd9500"
+              strokeWidth="1.6"
               fill="none"
+              opacity="0.55"
+            />
+            <path
+              d="M171 134 q-4 22 -7 34"
+              stroke="#dd9500"
+              strokeWidth="1.3"
+              fill="none"
+              opacity="0.4"
             />
           </g>
 

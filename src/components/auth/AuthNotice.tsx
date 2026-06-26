@@ -1,20 +1,42 @@
 import Icon from "../Icon";
 
+type Tone = "success" | "error";
+
+const TONES: Record<Tone, { wrap: string; text: string; icon: "check" | "close" }> = {
+  success: {
+    wrap: "border-pond-400/40 bg-pond-300/20",
+    text: "text-pond-700",
+    icon: "check",
+  },
+  error: {
+    wrap: "border-bill-400/40 bg-bill-300/20",
+    text: "text-bill-700",
+    icon: "close",
+  },
+};
+
 /**
- * Shown after a valid submit while there's no backend: makes it clear the form
- * is wired visually but auth isn't connected yet. Replace with real success/
- * error handling once authentication is plugged in.
+ * Inline status banner shown above the form. `tone` switches between a positive
+ * (success) and a negative (error) treatment so the auth screens can surface
+ * real Clerk results without changing their layout.
  */
-export default function AuthNotice({ message }: { message: string }) {
+export default function AuthNotice({
+  message,
+  tone = "success",
+}: {
+  message: string;
+  tone?: Tone;
+}) {
+  const t = TONES[tone];
   return (
     <div
       role="status"
-      className="mb-5 flex items-start gap-3 rounded-card border border-pond-400/40 bg-pond-300/20 px-4 py-3"
+      className={`mb-5 flex items-start gap-3 rounded-card border px-4 py-3 ${t.wrap}`}
     >
-      <span className="mt-0.5 shrink-0 text-pond-700">
-        <Icon name="check" size={18} />
+      <span className={`mt-0.5 shrink-0 ${t.text}`}>
+        <Icon name={t.icon} size={18} />
       </span>
-      <p className="font-body text-sm leading-relaxed text-pond-700">{message}</p>
+      <p className={`font-body text-sm leading-relaxed ${t.text}`}>{message}</p>
     </div>
   );
 }

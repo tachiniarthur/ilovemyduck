@@ -7,6 +7,7 @@ import { shareAllSegments } from "@/lib/share";
 import { downloadAllAsZip } from "@/lib/zip";
 import SegmentCard from "./SegmentCard";
 import Icon from "./Icon";
+import ButtonSpinner from "./ButtonSpinner";
 import DuckGlyph from "./brand/DuckGlyph";
 
 interface ResultsViewProps {
@@ -18,6 +19,7 @@ export default function ResultsView({ segments, onStartOver }: ResultsViewProps)
   // Detect environment on the client only (avoids SSR/hydration mismatch).
   const [env, setEnv] = useState({ mobile: false, ios: false, canShare: false });
   const [zipProgress, setZipProgress] = useState<number | null>(null);
+  const [sharing, setSharing] = useState(false);
 
   useEffect(() => {
     setEnv({ mobile: isMobile(), ios: isIOS(), canShare: canShareFiles() });
@@ -35,7 +37,13 @@ export default function ResultsView({ segments, onStartOver }: ResultsViewProps)
   };
 
   const handleShareAll = async () => {
-    await shareAllSegments(segments);
+    if (sharing) return;
+    setSharing(true);
+    try {
+      await shareAllSegments(segments);
+    } finally {
+      setSharing(false);
+    }
   };
 
   return (
@@ -66,10 +74,11 @@ export default function ResultsView({ segments, onStartOver }: ResultsViewProps)
           <button
             type="button"
             onClick={handleShareAll}
-            className="btn-success flex-1 px-4 py-3 text-sm"
+            disabled={sharing}
+            className="btn-success flex-1 px-4 py-3 text-sm disabled:cursor-wait disabled:opacity-80"
           >
-            <Icon name="stories" size={18} />
-            Compartilhar todas as partes
+            {sharing ? <ButtonSpinner /> : <Icon name="stories" size={18} />}
+            {sharing ? "Compartilhando…" : "Compartilhar todas as partes"}
           </button>
         )}
 
@@ -79,7 +88,7 @@ export default function ResultsView({ segments, onStartOver }: ResultsViewProps)
           disabled={zipProgress !== null}
           className="btn-secondary flex-1 px-4 py-3 text-sm disabled:cursor-wait disabled:opacity-80"
         >
-          <Icon name="download" size={18} />
+          {zipProgress !== null ? <ButtonSpinner /> : <Icon name="download" size={18} />}
           {zipProgress !== null
             ? `Empacotando… ${Math.round(zipProgress * 100)}%`
             : "Baixar tudo em ZIP"}

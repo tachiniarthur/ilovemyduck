@@ -1,20 +1,18 @@
-import Link from "next/link";
 import Reveal from "../Reveal";
 import Icon from "../Icon";
 
 /**
- * ── PREÇOS TEMPORÁRIOS ──────────────────────────────────────────────────
- * Todos os valores abaixo são FICTÍCIOS e provisórios. Para alterar, mude
- * apenas `price`, `period`, `note` e `features`. O plano com `featured: true`
- * é o destacado como recomendado. Não há cobrança real conectada ainda, cada
- * botão leva ao cadastro.
+ * Seção de planos da landing. Versão estática/visual: mostra os planos mensal e
+ * anual com os valores e o destaque de economia do anual. Os botões de assinar
+ * são placeholders, sem ação de pagamento — o checkout (Stripe puro) será
+ * conectado depois, em outra etapa.
  */
-interface Plan {
-  id: string;
+
+interface StaticPlan {
   name: string;
+  tagline: string;
   price: string;
   period: string;
-  tagline: string;
   note?: string;
   features: string[];
   cta: string;
@@ -22,31 +20,12 @@ interface Plan {
   badge?: string;
 }
 
-const PLANS: Plan[] = [
+const PLANS: StaticPlan[] = [
   {
-    id: "avulso",
-    name: "Por vídeo",
-    price: "R$ 2,90",
-    period: "/ vídeo",
-    tagline: "Pra fatiar um vídeo só, sem assinar nada.",
-    features: ["1 vídeo", "Cortes de 15, 30 ou 60s", "100% no navegador"],
-    cta: "Fatiar um vídeo",
-  },
-  {
-    id: "semanal",
-    name: "Semanal",
-    price: "R$ 9,90",
-    period: "/ semana",
-    tagline: "Pra uma semana de posts em sequência.",
-    features: ["Vídeos ilimitados por 7 dias", "Todos os tamanhos de corte", "Baixar tudo em ZIP"],
-    cta: "Começar a semana",
-  },
-  {
-    id: "mensal",
     name: "Mensal",
-    price: "R$ 19,90",
-    period: "/ mês",
     tagline: "O ritmo certo pra quem posta sempre.",
+    price: "$3.50",
+    period: "/ mês",
     features: [
       "Vídeos ilimitados",
       "Todos os tamanhos de corte",
@@ -58,13 +37,16 @@ const PLANS: Plan[] = [
     badge: "Mais popular",
   },
   {
-    id: "anual",
     name: "Anual",
-    price: "R$ 149,90",
-    period: "/ ano",
-    note: "≈ R$ 12,49 / mês",
     tagline: "O melhor custo pra quem leva a sério.",
-    features: ["Tudo do plano mensal", "Equivale a 2 meses grátis", "Suporte prioritário"],
+    price: "$35.04",
+    period: "/ ano",
+    note: "equivale a cerca de $2.92 / mês",
+    features: [
+      "Tudo do plano mensal",
+      "Mais barato no mês que o mensal",
+      "Suporte prioritário",
+    ],
     cta: "Assinar anual",
   },
 ];
@@ -84,24 +66,24 @@ export default function Pricing() {
         </Reveal>
         <Reveal as="p" delay={120}>
           <span className="mt-4 block text-pretty font-body text-lg leading-relaxed text-ink-muted">
-            Do avulso ao anual. Cancele quando quiser e, em todos eles, o vídeo
+            Do mensal ao anual. Cancele quando quiser e, nos dois, o vídeo
             continua sendo processado só no seu aparelho.
           </span>
         </Reveal>
       </div>
 
-      <div className="mt-14 grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4 lg:items-center">
+      <div className="mt-14 grid grid-cols-1 gap-5 sm:grid-cols-2 lg:mx-auto lg:max-w-3xl lg:items-center">
         {PLANS.map((plan, i) => (
           <Reveal
-            key={plan.id}
+            key={plan.name}
             delay={i * 70}
             className={plan.featured ? "relative z-10" : ""}
           >
             <div
               className={`relative flex h-full flex-col rounded-card p-6 transition-shadow ${
                 plan.featured
-                  ? "border-2 border-bill-500 bg-cream-50 shadow-accent-lg lg:h-[31rem] lg:pt-9 lg:scale-[1.05]"
-                  : "border border-bark-200 bg-cream-50/80 shadow-card lg:h-[27rem]"
+                  ? "border-2 border-bill-500 bg-cream-50 shadow-accent-lg lg:h-[31rem] lg:pt-9 lg:scale-[1.03]"
+                  : "border border-bark-200 bg-cream-50/80 shadow-card lg:h-[29rem]"
               }`}
             >
               {plan.badge && (
@@ -122,7 +104,9 @@ export default function Pricing() {
                 <span className="font-display text-3xl font-semibold text-ink">
                   {plan.price}
                 </span>
-                <span className="font-mono text-xs text-ink-muted">{plan.period}</span>
+                <span className="font-mono text-xs text-ink-muted">
+                  {plan.period}
+                </span>
               </div>
               {plan.note && (
                 <p className="mt-1 font-mono text-xs text-pond-700">{plan.note}</p>
@@ -130,7 +114,10 @@ export default function Pricing() {
 
               <ul className="mt-5 flex-1 space-y-2.5">
                 {plan.features.map((f) => (
-                  <li key={f} className="flex items-start gap-2.5 font-body text-sm text-ink-soft">
+                  <li
+                    key={f}
+                    className="flex items-start gap-2.5 font-body text-sm text-ink-soft"
+                  >
                     <span className="mt-0.5 shrink-0 text-pond-600">
                       <Icon name="check" size={16} />
                     </span>
@@ -139,14 +126,18 @@ export default function Pricing() {
                 ))}
               </ul>
 
-              <Link
-                href="/cadastro"
+              {/* Placeholder: sem ação de pagamento por enquanto. O checkout
+                  (Stripe puro) será conectado em outra etapa. */}
+              <button
+                type="button"
+                aria-disabled="true"
+                title="Em breve"
                 className={`mt-6 w-full px-4 py-3 text-sm ${
                   plan.featured ? "btn-primary" : "btn-secondary"
                 }`}
               >
                 {plan.cta}
-              </Link>
+              </button>
             </div>
           </Reveal>
         ))}

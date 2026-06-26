@@ -3,7 +3,10 @@
 import { useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
+import { SignedIn, SignedOut, useUser } from "@clerk/nextjs";
 import Icon from "./Icon";
+import UserMenu from "./UserMenu";
+import SpinnerLink from "./SpinnerLink";
 
 // Section anchors are absolute (prefixed with "/") so they resolve from the
 // tool and auth pages too, not just the landing page.
@@ -16,6 +19,9 @@ const NAV = [
 
 export default function SiteHeader() {
   const [open, setOpen] = useState(false);
+  const { isLoaded, isSignedIn } = useUser();
+  // Os links centrais de navegação só aparecem para visitantes não logados.
+  const showNav = isLoaded && !isSignedIn;
 
   return (
     <header className="sticky top-0 z-50 border-b border-bark-200/70 bg-cream-100/80 backdrop-blur-md">
@@ -35,26 +41,33 @@ export default function SiteHeader() {
           />
         </Link>
 
-        {/* Desktop nav */}
-        <nav className="hidden items-center gap-7 md:flex" aria-label="Principal">
-          {NAV.map((item) => (
-            <Link
-              key={item.href}
-              href={item.href}
-              className="rounded font-body text-sm font-medium text-ink-muted transition-colors hover:text-ink"
-            >
-              {item.label}
-            </Link>
-          ))}
-        </nav>
+        {/* Desktop nav: apenas para visitantes não logados */}
+        {showNav && (
+          <nav className="hidden items-center gap-7 md:flex" aria-label="Principal">
+            {NAV.map((item) => (
+              <Link
+                key={item.href}
+                href={item.href}
+                className="rounded font-body text-sm font-medium text-ink-muted transition-colors hover:text-ink"
+              >
+                {item.label}
+              </Link>
+            ))}
+          </nav>
+        )}
 
         <div className="hidden items-center gap-2 md:flex">
-          <Link href="/login" className="btn-ghost px-3 py-2 text-sm">
-            Entrar
-          </Link>
-          <Link href="/cadastro" className="btn-primary px-4 py-2 text-sm">
-            Criar conta
-          </Link>
+          <SignedOut>
+            <SpinnerLink href="/login" className="btn-ghost px-3 py-2 text-sm">
+              Entrar
+            </SpinnerLink>
+            <SpinnerLink href="/cadastro" className="btn-primary px-4 py-2 text-sm">
+              Criar conta
+            </SpinnerLink>
+          </SignedOut>
+          <SignedIn>
+            <UserMenu />
+          </SignedIn>
         </div>
 
         {/* Mobile toggle */}
@@ -77,32 +90,38 @@ export default function SiteHeader() {
           className="border-t border-bark-200/70 bg-cream-100/95 backdrop-blur-md md:hidden"
         >
           <nav className="container-page flex flex-col py-3" aria-label="Principal (mobile)">
-            {NAV.map((item) => (
-              <Link
-                key={item.href}
-                href={item.href}
-                onClick={() => setOpen(false)}
-                className="rounded-button px-2 py-3 font-body text-base font-medium text-ink-soft hover:bg-cream-200"
-              >
-                {item.label}
-              </Link>
-            ))}
-            <div className="mt-2 flex gap-2 px-2 pb-2 pt-3">
-              <Link
-                href="/login"
-                onClick={() => setOpen(false)}
-                className="btn-secondary flex-1 px-4 py-2.5 text-sm"
-              >
-                Entrar
-              </Link>
-              <Link
-                href="/cadastro"
-                onClick={() => setOpen(false)}
-                className="btn-primary flex-1 px-4 py-2.5 text-sm"
-              >
-                Criar conta
-              </Link>
-            </div>
+            {showNav &&
+              NAV.map((item) => (
+                <Link
+                  key={item.href}
+                  href={item.href}
+                  onClick={() => setOpen(false)}
+                  className="rounded-button px-2 py-3 font-body text-base font-medium text-ink-soft hover:bg-cream-200"
+                >
+                  {item.label}
+                </Link>
+              ))}
+            <SignedOut>
+              <div className="mt-2 flex gap-2 px-2 pb-2 pt-3">
+                <SpinnerLink
+                  href="/login"
+                  onBeforeNavigate={() => setOpen(false)}
+                  className="btn-secondary flex-1 px-4 py-2.5 text-sm"
+                >
+                  Entrar
+                </SpinnerLink>
+                <SpinnerLink
+                  href="/cadastro"
+                  onBeforeNavigate={() => setOpen(false)}
+                  className="btn-primary flex-1 px-4 py-2.5 text-sm"
+                >
+                  Criar conta
+                </SpinnerLink>
+              </div>
+            </SignedOut>
+            <SignedIn>
+              <UserMenu variant="inline" onSignOut={() => setOpen(false)} />
+            </SignedIn>
           </nav>
         </div>
       )}

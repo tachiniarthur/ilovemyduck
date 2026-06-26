@@ -335,6 +335,93 @@ body {
   50% { opacity: 1; transform: translateY(-2px); }
 }
 
+/* ---- Auth brand panel (left column) ---------------------------------- */
+/* A layered, lit backdrop instead of a flat two-stop gradient: a soft diagonal
+   warmth that resolves into pond/sky at the foot, two directional brand glows
+   and a couple of faint "bubble" lights. The decorative wave + bubbles SVG and
+   the blurred blobs live in the markup. Everything is kept low-contrast so the
+   ink title and muted paragraph stay perfectly legible on top. */
+.auth-aside {
+  background-color: #fff8ee;
+  background-image:
+    linear-gradient(
+      154deg,
+      rgba(255, 243, 196, 0.95) 0%,
+      rgba(255, 248, 238, 0.5) 42%,
+      rgba(191, 231, 255, 0.55) 100%
+    ),
+    radial-gradient(120% 85% at 12% -4%, rgba(247, 181, 0, 0.2) 0%, transparent 55%),
+    radial-gradient(95% 75% at 102% 104%, rgba(95, 214, 160, 0.16) 0%, transparent 60%),
+    radial-gradient(34% 30% at 78% 26%, rgba(143, 214, 255, 0.16) 0%, transparent 70%);
+}
+/* Directional sheen from the top-left, like light catching the panel. */
+.auth-aside::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: radial-gradient(
+    60% 50% at 28% 14%,
+    rgba(255, 255, 255, 0.6),
+    transparent 70%
+  );
+}
+/* The discreet organic water/duck layer (waves + bubbles) sits behind copy. */
+.auth-aside-decor {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+/* ---- StoryStrip: a calm, looping demo of the product idea ------------ */
+/* One shared loop drives the whole choreography so the parts stay in sync:
+   the player progress fills, the scissors snip the perforation, then the four
+   frames resolve in sequence and hold before the loop quietly resets. Each
+   element's keyframes return to their own start state, so the loop is seamless
+   and per-element delays only set the running order. */
+.is-animated {
+  --strip-loop: 9s;
+}
+.is-animated .strip-progress {
+  transform: scaleX(0);
+  animation: strip-progress var(--strip-loop) var(--ease-soft) infinite;
+}
+.is-animated .strip-scissors {
+  animation: strip-scissors var(--strip-loop) ease-in-out infinite;
+}
+.is-animated .strip-frame {
+  opacity: 0;
+  animation: strip-frame-cycle var(--strip-loop) var(--ease-soft) infinite;
+}
+.is-animated .strip-frame:nth-child(1) { animation-delay: 0s; }
+.is-animated .strip-frame:nth-child(2) { animation-delay: 0.16s; }
+.is-animated .strip-frame:nth-child(3) { animation-delay: 0.32s; }
+.is-animated .strip-frame:nth-child(4) { animation-delay: 0.48s; }
+
+@keyframes strip-progress {
+  0%, 4% { transform: scaleX(0); opacity: 1; }
+  20% { transform: scaleX(1); opacity: 1; }
+  82% { transform: scaleX(1); opacity: 1; }
+  92% { transform: scaleX(1); opacity: 0; }
+  100% { transform: scaleX(0); opacity: 0; }
+}
+@keyframes strip-scissors {
+  0%, 16% { transform: translateX(-50%) rotate(0deg) scale(1); }
+  20% { transform: translateX(-50%) rotate(-14deg) scale(1.08); }
+  24% { transform: translateX(-50%) rotate(8deg) scale(0.96); }
+  28% { transform: translateX(-50%) rotate(-4deg) scale(1.03); }
+  32%, 100% { transform: translateX(-50%) rotate(0deg) scale(1); }
+}
+@keyframes strip-frame-cycle {
+  0%, 26% { opacity: 0; transform: translateY(10px) scale(0.94); }
+  33% { opacity: 1; transform: none; }
+  80% { opacity: 1; transform: none; }
+  90% { opacity: 0; transform: translateY(6px) scale(0.97); }
+  100% { opacity: 0; transform: translateY(10px) scale(0.94); }
+}
+
 /* Respect users who prefer less motion: no entrances, no loops. */
 @media (prefers-reduced-motion: reduce) {
   *,
@@ -347,5 +434,17 @@ body {
   .reveal {
     opacity: 1;
     transform: none;
+  }
+  /* Static, fully-resolved version of the demo card. */
+  .is-animated .strip-frame {
+    opacity: 1;
+    transform: none;
+  }
+  .is-animated .strip-progress {
+    transform: scaleX(1);
+    opacity: 1;
+  }
+  .is-animated .strip-scissors {
+    transform: translateX(-50%);
   }
 }

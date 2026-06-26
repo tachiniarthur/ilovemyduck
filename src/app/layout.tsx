@@ -1,3 +1,5 @@
+import { ClerkProvider } from "@clerk/nextjs";
+import { ptBR } from "@clerk/localizations";
 import type { Metadata, Viewport } from "next";
 import { Fraunces, Plus_Jakarta_Sans, DM_Mono } from "next/font/google";
 import "./globals.css";
@@ -31,6 +33,10 @@ export const metadata: Metadata = {
   title: "I Love My Duck: Fatie seu vídeo para os Stories",
   description:
     "Transforme um vídeo longo em várias partes prontas para postar em sequência nos Stories do Instagram, direto no navegador. 100% privado: seu vídeo nunca sai do seu aparelho.",
+  icons: {
+    icon: "/favicon.ico",
+    shortcut: "/favicon.ico",
+  },
 };
 
 export const viewport: Viewport = {
@@ -52,7 +58,9 @@ export default function RootLayout({
       className={`${display.variable} ${body.variable} ${mono.variable}`}
     >
       <body className="bg-cream-100 font-body text-ink-soft antialiased">
-        {children}
+        <ClerkProvider localization={ptBR}>
+          {children}
+        </ClerkProvider>
       </body>
     </html>
   );

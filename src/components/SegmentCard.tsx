@@ -5,6 +5,7 @@ import type { VideoSegment } from "@/types";
 import { formatDuration } from "@/lib/format";
 import { saveSegment } from "@/lib/share";
 import Icon from "./Icon";
+import ButtonSpinner from "./ButtonSpinner";
 
 interface SegmentCardProps {
   segment: VideoSegment;
@@ -67,6 +68,7 @@ export default function SegmentCard({ segment, saveMode }: SegmentCardProps) {
                   : "border border-bark-200 bg-cream-50 text-ink shadow-button hover:border-bark-300 hover:bg-cream-100"
             }`}
         >
+          {status === "saving" && <ButtonSpinner />}
           {status !== "saving" && status !== "error" && (
             <Icon name={saveMode === "share" ? "stories" : "download"} size={16} />
           )}

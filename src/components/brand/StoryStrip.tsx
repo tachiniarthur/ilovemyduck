@@ -14,9 +14,19 @@ const FRAME_TINTS = [
   "from-bill-400/40 to-bill-500/25",
 ];
 
-export default function StoryStrip() {
+/**
+ * `animated` plays a calm, looping demo of the whole product idea (used on the
+ * auth brand panel): the player progress fills, the scissors snip the slice
+ * line, then the four story frames resolve in sequence, hold, and the loop
+ * gently resets. Everything is neutralised to a static card by reduced-motion.
+ */
+export default function StoryStrip({ animated = false }: { animated?: boolean }) {
   return (
-    <div className="card relative overflow-hidden p-5 sm:p-6">
+    <div
+      className={`card relative overflow-hidden p-5 sm:p-6 ${
+        animated ? "is-animated" : ""
+      }`}
+    >
       {/* Source video bar */}
       <div className="flex items-center gap-3 rounded-xl border border-bark-200 bg-cream-100 px-4 py-3">
         <span className="grid h-9 w-9 shrink-0 place-items-center rounded-lg bg-ink text-cream-50">
@@ -25,7 +35,7 @@ export default function StoryStrip() {
         <div className="min-w-0 flex-1">
           <p className="font-body text-xs font-semibold text-ink">video-completo.mp4</p>
           <div className="mt-1.5 h-1.5 w-full overflow-hidden rounded-full bg-bark-200">
-            <div className="h-full w-full rounded-full bg-gradient-to-r from-duck-400 via-bill-400 to-bill-600" />
+            <div className="strip-progress h-full w-full origin-left rounded-full bg-gradient-to-r from-duck-400 via-bill-400 to-bill-600" />
           </div>
         </div>
         <span className="shrink-0 font-mono text-xs text-ink-muted">3:12</span>
@@ -34,7 +44,7 @@ export default function StoryStrip() {
       {/* Slice line with scissors riding the perforation */}
       <div className="relative my-5 flex items-center">
         <span className="slice-line w-full" />
-        <span className="absolute left-1/2 grid h-7 w-7 -translate-x-1/2 place-items-center rounded-full border border-bark-200 bg-cream-50 text-bill-600 shadow-button">
+        <span className="strip-scissors absolute left-1/2 grid h-7 w-7 -translate-x-1/2 place-items-center rounded-full border border-bark-200 bg-cream-50 text-bill-600 shadow-button">
           <Icon name="scissors" size={15} />
         </span>
       </div>
@@ -44,7 +54,7 @@ export default function StoryStrip() {
         {FRAME_TINTS.map((tint, i) => (
           <div
             key={i}
-            className={`relative aspect-[9/16] overflow-hidden rounded-lg bg-gradient-to-b ${tint} ring-1 ring-bark-200`}
+            className={`strip-frame relative aspect-[9/16] overflow-hidden rounded-lg bg-gradient-to-b ${tint} ring-1 ring-bark-200`}
           >
             <span className="absolute left-1.5 top-1.5 rounded-md bg-ink/80 px-1.5 py-0.5 font-mono text-[10px] font-medium text-cream-50">
               {String(i + 1).padStart(2, "0")}
